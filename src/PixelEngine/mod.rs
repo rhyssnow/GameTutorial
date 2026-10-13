@@ -11,6 +11,53 @@ mod pixelengine {
     use std::time::Instant;
     use sdl3::pixels::Color;
     use sdl3::video::Window;
+    use crate::PixelEngine::trigger::trigger;
+
+    pub struct meshBox {
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+        endeOfDirection: Vec<String>,
+        triggers: trigger
+    }
+
+    impl meshBox {
+        fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec) -> meshBox {meshBox{x, y, width, height, endeOfDirection: Vec::new(), triggers: Vec::new()}}
+        fn render(&mut self, texture: &Texture, renderer: &mut WindowCanvas, renderArea: FRect) {
+            let textureArea = FRect::new(self.x, self.y, renderArea.w / 6.0, renderArea.h / 6.0 );
+
+            self.width = renderArea.w /6.0;
+            self.height = renderArea.h /6.0;
+
+            renderer.copy(texture, textureArea, renderArea).unwrap();
+        }
+        fn updatePosition(&mut self, mx: f32, my: f32, texture: &Texture) {
+            self.x += mx;
+            self.y += my;
+            self.endeOfDirection.clear();
+
+            if self.x <= 0.0{
+                self.x = 0.0;
+                self.endeOfDirection.push("left".to_string());
+            }
+
+            if self.x + self.width >= texture.width() as f32{
+                self.x = texture.width() as f32 - self.width;
+                self.endeOfDirection.push("right".to_string());
+            }
+
+            if self.y <= 0.0{
+                self.y = 0.0;
+                self.endeOfDirection.push("up".to_string());
+            }
+
+            if self.y + self.height >= texture.height() as f32{
+                self.y = texture.height() as f32 - self.height;
+                self.endeOfDirection.push("down".to_string());
+            }
+        }
+    }
 
     pub struct mainCharacter{
         x: f32,
