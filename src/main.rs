@@ -3,7 +3,7 @@
 
 mod PixelEngine;
 
-use crate::PixelEngine::*;
+use crate::PixelEngine::parse::*;
 
 fn main() {
     println!("Hello, world!");
