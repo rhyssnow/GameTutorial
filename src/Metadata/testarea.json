@@ -1,0 +1,12 @@
+{
+  "meshBox" : [
+    {"background" : "src/Assets/grass.png"},
+    {"triggers" : [
+      {"triggerType": "spawnWolfAlways", "x" : "0", "y" : 0, "w" : 0, "h" : 0}
+    ]}
+  ],
+  "enemies" : [
+    {"enemyType" : "wolf", "x" : 100, "y" : 100},
+    {"enemyType" : "wolf", "x" : 10, "y" : 10}
+  ]
+}

@@ -1,6 +1,6 @@
-use crate::PixelEngine::basic::enemy;
-
 pub struct roamPattern {
-    enemy: enemy
+    roamType: String,
 }
-impl roamPattern {}
+impl roamPattern {
+    pub fn new(roamType: String) -> roamPattern {roamPattern{roamType}}
+}

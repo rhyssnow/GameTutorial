@@ -13,8 +13,8 @@ use crate::PixelEngine::roam::roamPattern;
 use crate::PixelEngine::trigger::trigger;
 
 pub struct meshBox {
-    x: f32,
-    y: f32,
+    pub(crate) x: f32,
+    pub(crate) y: f32,
     width: f32,
     height: f32,
     pub(crate) endeOfDirection: Vec<String>,
@@ -23,7 +23,7 @@ pub struct meshBox {
 }
 
 impl meshBox {
-    pub fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec<trigger>, texturePos: usize) -> meshBox {meshBox{x, y, width, height, endeOfDirection: Vec::new(), triggers, texturePos}}
+    pub fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec<trigger>) -> meshBox {meshBox{x, y, width, height, endeOfDirection: Vec::new(), triggers, texturePos: 3}}
     pub fn render(&mut self, texture: &Texture, renderer: &mut WindowCanvas, renderArea: FRect) {
         let textureArea = FRect::new(self.x, self.y, renderArea.w / 6.0, renderArea.h / 6.0 );
 
@@ -60,7 +60,7 @@ impl meshBox {
 }
 
 pub struct mainCharacter{
-    x: f32,
+    pub(crate) x: f32,
     pub(crate) y: f32,
     pub(crate) direction: String,
     pub(crate) walkingPhase: usize,
@@ -68,13 +68,14 @@ pub struct mainCharacter{
     characterDown: [FRect; 3],
     characterRight: [FRect; 3],
     characterLeft: [FRect; 3],
-    hitBox: FRect,
+    pub(crate) hitBox: FRect,
     pub(crate) stats: stats,
     pub(crate) swordAttack: swordAttack,
     lastPhaseChange: Instant,
-    immune: bool,
+    pub(crate) immune: bool,
     render: bool,
-    timeSinceHit: Instant,
+    pub(crate) timeSinceHit: Instant,
+    texturePos: usize
 }
 impl mainCharacter {
     pub fn new(x: f32, y: f32, direction: String, health: f32) -> mainCharacter {mainCharacter{
@@ -93,6 +94,7 @@ impl mainCharacter {
         immune: false,
         render: true,
         timeSinceHit: Instant::now(),
+        texturePos: 0
     }}
     pub fn walkPhaseChange(&mut self) {
         if self.lastPhaseChange.elapsed().as_millis() >= 200 {
@@ -149,15 +151,16 @@ impl mainCharacter {
     }
 }
 pub struct stats {
-    health: f32,
+    pub(crate) health: f32,
     maxHealth: f32,
     pub(crate) stamina: f32,
     pub(crate) maxStamina: f32,
     mana: f32,
     maxMana: f32,
+    texturePos: usize
 }
 impl stats {
-    fn new(health: f32) -> stats {stats{health, maxHealth: health, stamina:10.0, maxStamina:10.0, mana:10.0, maxMana:10.0}}
+    fn new(health: f32) -> stats {stats{health, maxHealth: health, stamina:10.0, maxStamina:10.0, mana:10.0, maxMana:10.0, texturePos: 1}}
     fn render(&self, renderer: &mut WindowCanvas) {
         let maxHealthRenderBox = FRect::new(
             105.0,
@@ -217,11 +220,12 @@ pub struct swordAttack {
     swingDown: [FRect; 6],
     swingLeft: [FRect; 6],
     swingRight: [FRect; 6],
-    hitBox: FRect,
+    pub(crate) hitBox: FRect,
     pub(crate) swingPhase: usize,
     swingPhaseFloat: f32,
     pub(crate) direction: String,
     swingCooldown: Instant,
+    texturePos: usize,
 }
 
 impl swordAttack{
@@ -234,7 +238,9 @@ impl swordAttack{
         swingPhase: 6,
         swingPhaseFloat: 6.0,
         direction,
-        swingCooldown: Instant::now()}}
+        swingCooldown: Instant::now(),
+        texturePos: 2
+    }}
     fn render (&mut self, renderer: &mut WindowCanvas, characterX: f32, characterY: f32, texture: &Texture) {
         if self.swingPhase == 6 {
             self.hitBox.w = 0.0;
@@ -327,28 +333,29 @@ impl swordAttack{
     }
 }
 pub struct enemy {
-    x: f32,
-    y: f32,
+    pub(crate) x: f32,
+    pub(crate) y: f32,
     direction: String,
     walkingPhase: usize,
     enemyUp: Vec<FRect>,
     enemyDown: Vec<FRect>,
     enemyRight: Vec<FRect>,
     enemyLeft: Vec<FRect>,
-    hitBox: FRect,
-    health: f32,
+    pub(crate) hitBox: FRect,
+    pub(crate) health: f32,
     lastPhaseChange: Instant,
     render: bool,
-    timeSinceHit: Instant,
+    pub(crate) timeSinceHit: Instant,
     roam: bool,
     attacks: Box<attacks>,
-    roamPattern: Box<roamPattern>
+    roamPattern: Box<roamPattern>,
+    texturePos: usize
 }
 impl enemy {
-    fn new(x: f32, y: f32, direction: String, enemyUp: Vec<FRect>, enemyDown: Vec<FRect>, enemyLeft: Vec<FRect>, enemyRight: Vec<FRect>, attacks: attacks, roamPattern: roamPattern) -> enemy {enemy{
+    pub(crate) fn new(x: f32, y: f32, enemyUp: Vec<FRect>, enemyDown: Vec<FRect>, enemyLeft: Vec<FRect>, enemyRight: Vec<FRect>, attacks: attacks, roamPattern: roamPattern, texturePos: usize) -> enemy {enemy{
         x,
         y,
-        direction,
+        direction: "up".to_string(),
         walkingPhase: 0,
         enemyUp,
         enemyDown,
@@ -362,6 +369,7 @@ impl enemy {
         roam: true,
         attacks: Box::new(attacks),
         roamPattern: Box::new(roamPattern),
+        texturePos
     }}
     fn render(&mut self, texture: &Texture,renderer: &mut WindowCanvas, meshBox: &mut meshBox) {
         if !self.render{
@@ -386,7 +394,7 @@ impl enemy {
 
         renderer.copy(texture, rectSet[self.walkingPhase], self.hitBox).unwrap();
     }
-    fn updatePosition(&mut self, x: f32, y: f32, backgroundTexture: &Texture) {
+    pub(crate) fn updatePosition(&mut self, x: f32, y: f32, backgroundTexture: &Texture) {
         self.x += x;
         self.y += y;
 

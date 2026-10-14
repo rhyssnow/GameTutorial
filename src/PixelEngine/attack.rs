@@ -1,5 +1,7 @@
-use crate::PixelEngine::basic::enemy;
-
 pub struct attacks {
-    enemy: enemy
+    attackType: String,
+}
+
+impl attacks {
+    pub fn new(attackType: String) -> attacks {attacks{attackType}}
 }

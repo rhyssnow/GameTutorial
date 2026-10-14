@@ -8,7 +8,8 @@ pub mod trigger;
 pub mod basic;
 
 mod pixelengine {
-    use sdl3::render::{Texture};
+    use std::time::Instant;
+    use sdl3::render::{FRect, Texture};
     use sdl3::keyboard::Scancode;
     use sdl3::video::Window;
 
@@ -131,5 +132,87 @@ mod pixelengine {
                 }
             }
         }
+        fn update(&mut self,  textureVec: &Vec<Texture>) {
+            for enemy in self.enemies.iter_mut() {
+                //add enemy movement updates here
+                if hitboxDetector(enemy.hitBox, self.mainCharacter.hitBox) && !self.mainCharacter.immune {
+                    self.mainCharacter.timeSinceHit = Instant::now();
+                    self.mainCharacter.stats.health -= 2.0;
+                    if self.mainCharacter.stats.health <= 0.0 {
+                        self.alive = false;
+                    }
+                }
+                if hitboxDetector(enemy.hitBox, self.mainCharacter.swordAttack.hitBox) {
+                    let speed = 2.0;
+                    let mainPosX = self.mainCharacter.x + self.meshBox.x * 6.0;
+                    let mainPosY = self.mainCharacter.y + self.meshBox.y * 6.0;
+
+                    let dx = mainPosX - enemy.x * 6.0;
+                    let dy = mainPosY - enemy.y * 6.0;
+
+                    let mut dxRatio = dx / dy;
+                    if dxRatio < 0.0{
+                        dxRatio = -dxRatio;
+                    }
+                    dxRatio += 1.0;
+
+                    let mut my = speed / dxRatio;
+                    let mut mx = speed - my;
+                    if my > speed {
+                        mx = speed / dxRatio;
+                        my = speed - my;
+                    }
+
+                    if dx < 0.0 {
+                        mx = -mx;
+                    }
+                    if dy < 0.0 {
+                        my = -my;
+                    }
+
+                    enemy.health -= 0.1;
+                    enemy.updatePosition(-mx, -my, &textureVec[self.meshBox.texturePos]);
+                    enemy.timeSinceHit = Instant::now();
+                }
+            }
+            let mut removeEnemy = Vec::new();
+            for enemy in 0..self.enemies.len() {
+                if self.enemies[enemy].health < 0.0 {
+                    removeEnemy.push(enemy);
+                }
+            }
+            removeEnemy.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            for enemy in removeEnemy {
+                self.enemies.remove(enemy);
+            }
+        }
+    }
+    fn hitboxDetector(hitbox1: FRect, hitbox2: FRect) -> bool {
+        let mut touching = true;
+
+        let top1 = hitbox1.y;
+        let bottom1 = hitbox1.y + hitbox1.h;
+        let left1 = hitbox1.x;
+        let right1 = hitbox1.x + hitbox1.w;
+
+        let top2 = hitbox2.y;
+        let bottom2 = hitbox2.y + hitbox2.h;
+        let left2 = hitbox2.x;
+        let right2 = hitbox2.x + hitbox2.w;
+
+        if bottom1 < top2{
+            touching = false;
+        }
+        if top1 > bottom2{
+            touching = false;
+        }
+        if left1 > right2{
+            touching = false;
+        }
+        if right1 < left2{
+            touching = false;
+        }
+
+        touching
     }
 }
