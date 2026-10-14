@@ -1,16 +1,13 @@
-use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use serde_json::Value;
-use rfd::FileDialog;
-use sdl3::gpu::Texture;
 use sdl3::render::FRect;
 use crate::PixelEngine::attack::attacks;
-use crate::PixelEngine::basic::{enemy, mainCharacter, meshBox};
+use crate::PixelEngine::basic::{enemy, meshBox};
 use crate::PixelEngine::roam::roamPattern;
 use crate::PixelEngine::trigger::trigger;
 
-fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy>) {
+pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy>) {
     let mut meshBox: meshBox;
     let mut textureVec = Vec::new();
     let mut enemies = Vec::new();
@@ -31,7 +28,7 @@ fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy
             triggerVec.push(trigger::new(trigger["triggerType"].to_string(), triggerArea));
         }
     }
-    meshBox = meshBox::new(0.0, 0.0, 0.0, 0.0, triggerVec)
+    meshBox = meshBox::new(0.0, 0.0, 0.0, 0.0, triggerVec);
 
     let content = fs::read_to_string(Path::new("src/Metadata/enemies.json")).unwrap();
     let enemyData: Value = serde_json::from_str(&content).unwrap();
