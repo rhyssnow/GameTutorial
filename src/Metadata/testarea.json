@@ -1,8 +1,7 @@
 {
   "meshBox" : [
-    {"background" : "src/Assets/grass.png"},
-    {"triggers" : [
-      {"triggerType": "spawnWolfAlways", "x" : "0", "y" : 0, "w" : 0, "h" : 0}
+    {"background" : "src/Assets/grass.png", "triggers" : [
+      {"triggerType": "spawnWolfAlways", "x" : 0, "y" : 0, "w" : 0, "h" : 0}
     ]}
   ],
   "enemies" : [

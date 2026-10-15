@@ -4,11 +4,15 @@
 mod PixelEngine;
 
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 use sdl3::pixels::Color;
 use sdl3::render::{create_renderer, WindowCanvas};
 use sdl3::surface::Surface;
+use sdl3::timer::delay;
 use sdl3::video::Window;
-use crate::PixelEngine::parse::createEnvironmentFromJson;
+
+use crate::PixelEngine::pixelEngine;
+use crate::PixelEngine::parse::{createEnvironmentFromJson, loadSaveFromJson};
 
 fn main() {
     let videoSubsystem = sdl3::init().unwrap().video().unwrap();
@@ -40,9 +44,8 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
     textureSword.set_scale_mode(sdl3::render::ScaleMode::Nearest);
     textureVec.push(textureSword);
 
-    let file = Path::new("src/Metadata/testarea.json");
-
-    let mut environment = createEnvironmentFromJson(PathBuf::from(file));
+    let save = loadSaveFromJson(&window);
+    let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*save.1 + ".json"))));
 
     for location in environment.0 {
         let surface = Surface::load_png(location).unwrap();
@@ -50,13 +53,27 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
         texture.set_scale_mode(sdl3::render::ScaleMode::Nearest);
         textureVec.push(texture);
     }
-    let mut meshBox = environment.1;
-    let mut enemies = environment.2;
-    
 
-    let running = true;
+    let mut meshBox = environment.1;
+    meshBox.x = save.2;
+    meshBox.y = save.3;
+
+    let mut pixelEngine = pixelEngine::new(meshBox, save.0, environment.2);
+
+    let mut running = true;
 
     while running == true {
+        let now = Instant::now();
 
+        pixelEngine.input(&window, &textureVec, &mut running);
+        pixelEngine.update(&textureVec);
+        pixelEngine.render(&textureVec, renderer, &window);
+
+        let mut elapsed = now.elapsed().as_millis();
+        if elapsed > 16 {
+            elapsed = 0;
+        }
+        let extraTime = 16 - elapsed;
+        delay(extraTime as u32);
     }
 }

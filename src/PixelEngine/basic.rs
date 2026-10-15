@@ -5,7 +5,6 @@
 
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use std::time::Instant;
-use sdl3::keyboard::Scancode;
 use sdl3::pixels::Color;
 use sdl3::video::Window;
 use crate::PixelEngine::attack::attacks;
@@ -13,24 +12,25 @@ use crate::PixelEngine::roam::roamPattern;
 use crate::PixelEngine::trigger::trigger;
 
 pub struct meshBox {
-    pub(crate) x: f32,
-    pub(crate) y: f32,
+    pub x: f32,
+    pub y: f32,
     width: f32,
     height: f32,
-    pub(crate) endeOfDirection: Vec<String>,
+    pub endeOfDirection: Vec<String>,
     triggers: Vec<trigger>,
-    pub(crate) texturePos: usize
+    pub texturePos: usize
 }
 
 impl meshBox {
     pub fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec<trigger>) -> meshBox {meshBox{x, y, width, height, endeOfDirection: Vec::new(), triggers, texturePos: 3}}
-    pub fn render(&mut self, texture: &Texture, renderer: &mut WindowCanvas, renderArea: FRect) {
+ 
+    pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, renderArea: FRect) {
         let textureArea = FRect::new(self.x, self.y, renderArea.w / 6.0, renderArea.h / 6.0 );
 
         self.width = renderArea.w /6.0;
         self.height = renderArea.h /6.0;
 
-        renderer.copy(texture, textureArea, renderArea).unwrap();
+        renderer.copy(&textureVec[self.texturePos], textureArea, renderArea).unwrap();
     }
     pub fn updatePosition(&mut self, mx: f32, my: f32, texture: &Texture) {
         self.x += mx;
@@ -60,28 +60,28 @@ impl meshBox {
 }
 
 pub struct mainCharacter{
-    pub(crate) x: f32,
-    pub(crate) y: f32,
-    pub(crate) direction: String,
-    pub(crate) walkingPhase: usize,
+    pub x: f32,
+    pub y: f32,
+    pub direction: String,
+    pub walkingPhase: usize,
     characterUp: [FRect; 3],
     characterDown: [FRect; 3],
     characterRight: [FRect; 3],
     characterLeft: [FRect; 3],
-    pub(crate) hitBox: FRect,
-    pub(crate) stats: stats,
-    pub(crate) swordAttack: swordAttack,
+    pub hitBox: FRect,
+    pub stats: stats,
+    pub swordAttack: swordAttack,
     lastPhaseChange: Instant,
-    pub(crate) immune: bool,
-    render: bool,
-    pub(crate) timeSinceHit: Instant,
+    pub immune: bool,
+    pub render: bool,
+    pub timeSinceHit: Instant,
     texturePos: usize
 }
 impl mainCharacter {
-    pub fn new(x: f32, y: f32, direction: String, health: f32) -> mainCharacter {mainCharacter{
+    pub fn new(x: f32, y: f32, health: f32) -> mainCharacter {mainCharacter{
         x,
         y,
-        direction,
+        direction: "down".to_string(),
         walkingPhase: 0,
         characterUp: [FRect::new(2.0, 33.0, 9.0, 16.0), FRect::new(12.0, 33.0, 9.0, 16.0), FRect::new(22.0, 33.0, 9.0, 16.0)],
         characterDown: [FRect::new(2.0, 49.0, 9.0, 16.0), FRect::new(12.0, 49.0, 9.0, 16.0), FRect::new(22.0, 49.0, 9.0, 16.0)] ,
@@ -115,7 +115,7 @@ impl mainCharacter {
             self.render = true;
         }
     }
-    pub fn render(&mut self, texture: &Texture, renderer: &mut WindowCanvas) {
+    pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas) {
         self.hitBox.x = self.x;
         self.hitBox.y = self.y;
 
@@ -130,7 +130,7 @@ impl mainCharacter {
         self.hitBox.w = rectSet[self.walkingPhase].w * 7.0;
         self.hitBox.h = rectSet[self.walkingPhase].h * 7.0;
 
-        renderer.copy(texture, rectSet[self.walkingPhase], self.hitBox).unwrap();
+        renderer.copy(&textureVec[self.texturePos], rectSet[self.walkingPhase], self.hitBox).unwrap();
     }
     pub fn updatePosition(&mut self, x: f32, y: f32, window: &Window) {
         self.x += x;
@@ -151,17 +151,17 @@ impl mainCharacter {
     }
 }
 pub struct stats {
-    pub(crate) health: f32,
+    pub health: f32,
     maxHealth: f32,
-    pub(crate) stamina: f32,
-    pub(crate) maxStamina: f32,
+    pub stamina: f32,
+    pub maxStamina: f32,
     mana: f32,
     maxMana: f32,
     texturePos: usize
 }
 impl stats {
     fn new(health: f32) -> stats {stats{health, maxHealth: health, stamina:10.0, maxStamina:10.0, mana:10.0, maxMana:10.0, texturePos: 1}}
-    fn render(&self, renderer: &mut WindowCanvas) {
+    pub fn render(&self, renderer: &mut WindowCanvas) {
         let maxHealthRenderBox = FRect::new(
             105.0,
             10.0,
@@ -220,10 +220,10 @@ pub struct swordAttack {
     swingDown: [FRect; 6],
     swingLeft: [FRect; 6],
     swingRight: [FRect; 6],
-    pub(crate) hitBox: FRect,
-    pub(crate) swingPhase: usize,
+    pub hitBox: FRect,
+    pub swingPhase: usize,
     swingPhaseFloat: f32,
-    pub(crate) direction: String,
+    pub direction: String,
     swingCooldown: Instant,
     texturePos: usize,
 }
@@ -241,7 +241,7 @@ impl swordAttack{
         swingCooldown: Instant::now(),
         texturePos: 2
     }}
-    fn render (&mut self, renderer: &mut WindowCanvas, characterX: f32, characterY: f32, texture: &Texture) {
+    pub fn render (&mut self, renderer: &mut WindowCanvas, characterX: f32, characterY: f32, textureVec: &Vec<Texture>) {
         if self.swingPhase == 6 {
             self.hitBox.w = 0.0;
             self.hitBox.h = 0.0;
@@ -321,10 +321,10 @@ impl swordAttack{
         };
 
         match self.direction.as_str() {
-            "up" => renderer.copy(texture, self.swingUp[self.swingPhase], self.hitBox).unwrap(),
-            "down" => renderer.copy(texture, self.swingDown[self.swingPhase], self.hitBox).unwrap(),
-            "left" => renderer.copy(texture, self.swingLeft[self.swingPhase], self.hitBox).unwrap(),
-            "right" => renderer.copy(texture, self.swingRight[self.swingPhase], self.hitBox).unwrap(),
+            "up" => renderer.copy(&textureVec[self.texturePos], self.swingUp[self.swingPhase], self.hitBox).unwrap(),
+            "down" => renderer.copy(&textureVec[self.texturePos], self.swingDown[self.swingPhase], self.hitBox).unwrap(),
+            "left" => renderer.copy(&textureVec[self.texturePos], self.swingLeft[self.swingPhase], self.hitBox).unwrap(),
+            "right" => renderer.copy(&textureVec[self.texturePos], self.swingRight[self.swingPhase], self.hitBox).unwrap(),
             _ => return
         };
 
@@ -333,26 +333,26 @@ impl swordAttack{
     }
 }
 pub struct enemy {
-    pub(crate) x: f32,
-    pub(crate) y: f32,
+    pub x: f32,
+    pub y: f32,
     direction: String,
     walkingPhase: usize,
     enemyUp: Vec<FRect>,
     enemyDown: Vec<FRect>,
     enemyRight: Vec<FRect>,
     enemyLeft: Vec<FRect>,
-    pub(crate) hitBox: FRect,
-    pub(crate) health: f32,
+    pub hitBox: FRect,
+    pub health: f32,
     lastPhaseChange: Instant,
-    render: bool,
-    pub(crate) timeSinceHit: Instant,
+    pub render: bool,
+    pub timeSinceHit: Instant,
     roam: bool,
     attacks: Box<attacks>,
     roamPattern: Box<roamPattern>,
     texturePos: usize
 }
 impl enemy {
-    pub(crate) fn new(x: f32, y: f32, enemyUp: Vec<FRect>, enemyDown: Vec<FRect>, enemyLeft: Vec<FRect>, enemyRight: Vec<FRect>, attacks: attacks, roamPattern: roamPattern, texturePos: usize) -> enemy {enemy{
+    pub fn new(x: f32, y: f32, enemyUp: Vec<FRect>, enemyDown: Vec<FRect>, enemyLeft: Vec<FRect>, enemyRight: Vec<FRect>, attacks: attacks, roamPattern: roamPattern, texturePos: usize) -> enemy {enemy{
         x,
         y,
         direction: "up".to_string(),
@@ -371,7 +371,7 @@ impl enemy {
         roamPattern: Box::new(roamPattern),
         texturePos
     }}
-    fn render(&mut self, texture: &Texture,renderer: &mut WindowCanvas, meshBox: &mut meshBox) {
+    pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, meshBox: &mut meshBox) {
         if !self.render{
             return;
         }
@@ -392,9 +392,9 @@ impl enemy {
         self.hitBox.x -= self.hitBox.w / 2.0;
         self.hitBox.y -= self.hitBox.h / 2.0;
 
-        renderer.copy(texture, rectSet[self.walkingPhase], self.hitBox).unwrap();
+        renderer.copy(&textureVec[self.texturePos], rectSet[self.walkingPhase], self.hitBox).unwrap();
     }
-    pub(crate) fn updatePosition(&mut self, x: f32, y: f32, backgroundTexture: &Texture) {
+    pub fn updatePosition(&mut self, x: f32, y: f32, backgroundTexture: &Texture) {
         self.x += x;
         self.y += y;
 
