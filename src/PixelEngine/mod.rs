@@ -12,8 +12,6 @@ use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::keyboard::Scancode;
 use sdl3::pixels::Color;
 use sdl3::video::Window;
-use std::mem;
-use serde_json::Value::Null;
 use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter};
 
 pub struct pixelEngine {
@@ -186,10 +184,16 @@ impl pixelEngine {
         }
     }
     pub fn update(&mut self,  textureVec: &Vec<Texture>) {
+        self.mainCharacter.update();
         for mut enemy in self.enemies.iter_mut() {
             //add enemy movement updates here
-            self.mainCharacter.update();
-            if hitboxDetector(enemy.hitBox, self.mainCharacter.hitBox) && !self.mainCharacter.immune {
+            let enemyUsedHitbox = FRect::new(
+                enemy.hitBox.x + enemy.hitBox.w * 0.1,
+                enemy.hitBox.y + enemy.hitBox.h * 0.1,
+                enemy.hitBox.w * 0.8,
+                enemy.hitBox.h * 0.8
+            );
+            if hitboxDetector(enemyUsedHitbox, self.mainCharacter.hitBox) && !self.mainCharacter.immune {
                 self.mainCharacter.timeSinceHit = Instant::now();
                 self.mainCharacter.stats.health -= 2.0;
                 if self.mainCharacter.stats.health <= 0.0 {
@@ -229,6 +233,16 @@ impl pixelEngine {
                 enemy.timeSinceHit = Instant::now();
             }
             enemy.update();
+        }
+        let mut enemiesClone=self.enemies.clone();
+        let texturePos = self.meshBox.texturePos;
+        for enemyPos in 0..self.enemies.len() {
+            if self.enemies[enemyPos].roam {
+                enemiesClone[enemyPos].roamPattern.roam(&mut self.mainCharacter, &mut self.meshBox, &mut self.enemies[enemyPos], &textureVec[texturePos]);
+            }
+            else {
+                enemiesClone[enemyPos].attacks.attack(&mut self.mainCharacter, &mut self.meshBox, &mut self.enemies[enemyPos], &textureVec[texturePos]);
+            }
         }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {

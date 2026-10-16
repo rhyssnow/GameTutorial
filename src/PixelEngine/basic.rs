@@ -339,10 +339,11 @@ impl swordAttack{
     }
 }
 
+#[derive(Clone)]
 pub struct enemy {
     pub x: f32,
     pub y: f32,
-    direction: String,
+    pub(crate) direction: String,
     walkingPhase: usize,
     enemyUp: Vec<FRect>,
     enemyDown: Vec<FRect>,
@@ -354,8 +355,8 @@ pub struct enemy {
     pub render: bool,
     pub timeSinceHit: Instant,
     pub(crate) roam: bool,
-    attacks: attacks,
-    pub(crate) roamPattern: roamPattern,
+    pub(crate) attacks: attacks,
+    pub roamPattern: roamPattern,
     texturePos: usize
 }
 impl enemy {

@@ -91,8 +91,8 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                 down,
                 left,
                 right,
-                attacks::new(enemyType["attackType"].to_string()),
-                roamPattern::new(enemyType["roamType"].to_string()),
+                attacks::new(enemyType["attackType"].as_str().unwrap().to_string()),
+                roamPattern::new(enemyType["roamType"].as_str().unwrap().to_string()),
                 texturePos.clone()
             ));
             textureVec.push("src/Assets/".to_string() + enemyType["textureFile"].as_str().unwrap());
