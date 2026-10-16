@@ -1,6 +1,6 @@
 {
-  "maxHealth" : 10.0,
+  "maxHealth" : 20.0,
   "currentArea" : "testarea",
-  "x" : 500.0,
-  "y" : 500.0
+  "x" : 0.0,
+  "y" : 0.0
 }

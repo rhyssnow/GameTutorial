@@ -12,7 +12,7 @@ pub fn loadSaveFromJson (window: &Window) -> (mainCharacter, String, f32, f32) {
     let content = fs::read_to_string(&"src/Metadata/save.json").unwrap();
     let data: Value = serde_json::from_str(&content).unwrap();
 
-    let mainCharacter = mainCharacter::new(window.size_in_pixels().0 as f32 - 35.0, window.size_in_pixels().1 as f32 - 66.0, data["maxHealth"].as_f64().unwrap() as f32);
+    let mainCharacter = mainCharacter::new(window.size_in_pixels().0 as f32 /2.0 - 35.0, window.size_in_pixels().1 as f32 /2.0, data["maxHealth"].as_f64().unwrap() as f32);
     let path = data["currentArea"].as_str().unwrap();
 
     (mainCharacter, path.to_string(), data["x"].as_f64().unwrap() as f32, data["y"].as_f64().unwrap() as f32)
@@ -99,6 +99,5 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
         }
         texturePos += 1;
     }
-
     (textureVec, meshBox, enemies) //the meshbox needs its width, height and x, y coordinates set before it is usable.
 }

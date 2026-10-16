@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-sdl3 = { version = "0.20.0", features = ["unsafe_textures"] }
+sdl3 = { version = "0.20.0", features = ["unsafe_textures", "ttf"] }
 serde_json = "1.0.154"
 rfd = "0.17.2"

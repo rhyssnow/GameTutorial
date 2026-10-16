@@ -3,10 +3,12 @@
 
 mod PixelEngine;
 
+use std::fs::File;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 use sdl3::pixels::Color;
-use sdl3::render::{create_renderer, WindowCanvas};
+use sdl3::render::{create_renderer, WindowCanvas, FRect};
 use sdl3::surface::Surface;
 use sdl3::timer::delay;
 use sdl3::video::Window;
@@ -62,7 +64,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
 
     let mut running = true;
 
-    while running == true {
+    while running && pixelEngine.alive {
         let now = Instant::now();
 
         pixelEngine.input(&window, &textureVec, &mut running);
@@ -75,5 +77,49 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
         }
         let extraTime = 16 - elapsed;
         delay(extraTime as u32);
+    }
+    delay(250);
+
+    let path = Path::new("src/Assets/DovesTypeText-Regular.ttf"); //here
+    let ttfContext = sdl3::ttf::init().map_err(|e| e.to_string()).unwrap();
+    let font = ttfContext.load_font(path, 100.0).expect("SDL_TTF failed to load font.");
+
+    let gameOverSurface = font.render("You Died").blended(Color::RGB(150, 50, 50)).unwrap();
+    let gameOverTexture = renderer.create_texture_from_surface(&gameOverSurface).unwrap();
+
+    let mut file = File::open("src/Assets/highscore.txt").unwrap(); //here
+    let mut buffer = String::new();
+    file.read_to_string(&mut buffer).unwrap();
+
+    let highScoreSurface = font.render(&*("High Score: ".to_string() + &buffer)).blended(Color::RGB(200, 200, 200)).unwrap();
+    let highScoreTexture = renderer.create_texture_from_surface(&highScoreSurface).unwrap();
+
+
+    while running {
+        renderer.set_draw_color(Color::RGB(0, 0, 0));
+        renderer.clear();
+
+
+        let deathMsgRect = FRect::new(
+            window.size_in_pixels().0 as f32 / 4.0,
+            50.0,
+            window.size_in_pixels().0 as f32 / 2.0,
+            window.size_in_pixels().1 as f32 / 3.0,
+        );
+        let mut highScoreMsgRect = FRect::new(
+            deathMsgRect.x + deathMsgRect.w / 3.0,
+            deathMsgRect.y + deathMsgRect.h + 50.0,
+            deathMsgRect.w / 3.0,
+            deathMsgRect.h / 3.0,
+        );
+
+        renderer.copy(&gameOverTexture, None, deathMsgRect).unwrap();
+        highScoreMsgRect.y += highScoreMsgRect.h + 50.0;
+        highScoreMsgRect.h /= 1.5;
+        renderer.copy(&highScoreTexture, None, highScoreMsgRect).unwrap();
+
+
+
+        renderer.present();
     }
 }

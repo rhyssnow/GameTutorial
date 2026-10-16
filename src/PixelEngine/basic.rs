@@ -16,14 +16,14 @@ pub struct meshBox {
     pub y: f32,
     width: f32,
     height: f32,
-    pub endeOfDirection: Vec<String>,
+    pub endOfDirection: Vec<String>,
     triggers: Vec<trigger>,
     pub texturePos: usize
 }
 
 impl meshBox {
-    pub fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec<trigger>) -> meshBox {meshBox{x, y, width, height, endeOfDirection: Vec::new(), triggers, texturePos: 3}}
- 
+    pub fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec<trigger>) -> meshBox {meshBox{x, y, width, height, endOfDirection: Vec::new(), triggers, texturePos: 3}}
+
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, renderArea: FRect) {
         let textureArea = FRect::new(self.x, self.y, renderArea.w / 6.0, renderArea.h / 6.0 );
 
@@ -35,26 +35,26 @@ impl meshBox {
     pub fn updatePosition(&mut self, mx: f32, my: f32, texture: &Texture) {
         self.x += mx;
         self.y += my;
-        self.endeOfDirection.clear();
+        self.endOfDirection.clear();
 
         if self.x <= 0.0 {
             self.x = 0.0;
-            self.endeOfDirection.push("left".to_string());
+            self.endOfDirection.push("left".to_string());
         }
 
         if self.x + self.width >= texture.width() as f32 {
             self.x = texture.width() as f32 - self.width;
-            self.endeOfDirection.push("right".to_string());
+            self.endOfDirection.push("right".to_string());
         }
 
         if self.y <= 0.0 {
             self.y = 0.0;
-            self.endeOfDirection.push("up".to_string());
+            self.endOfDirection.push("up".to_string());
         }
 
         if self.y + self.height >= texture.height() as f32 {
             self.y = texture.height() as f32 - self.height;
-            self.endeOfDirection.push("down".to_string());
+            self.endOfDirection.push("down".to_string());
         }
     }
 }
@@ -152,66 +152,72 @@ impl mainCharacter {
 }
 pub struct stats {
     pub health: f32,
-    maxHealth: f32,
+    pub(crate) maxHealth: f32,
     pub stamina: f32,
     pub maxStamina: f32,
-    mana: f32,
-    maxMana: f32,
+    pub(crate) mana: f32,
+    pub(crate) maxMana: f32,
     texturePos: usize
 }
 impl stats {
     fn new(health: f32) -> stats {stats{health, maxHealth: health, stamina:10.0, maxStamina:10.0, mana:10.0, maxMana:10.0, texturePos: 1}}
     pub fn render(&self, renderer: &mut WindowCanvas) {
         let maxHealthRenderBox = FRect::new(
-            105.0,
+            104.0,
             10.0,
             self.maxHealth * 25.0,
             25.0,
         );
         let healthRenderBox = FRect::new(
-            108.0,
+            107.0,
             13.0,
             self.health * 25.0 - 6.0,
             19.0,
         );
+
+
         renderer.set_draw_color(Color::RGB(180, 180, 180));
         renderer.fill_rect(maxHealthRenderBox).unwrap();
         renderer.set_draw_color(Color::RGB(130, 20, 20));
         renderer.fill_rect(healthRenderBox).unwrap();
 
         let maxStaminaRenderBox = FRect::new(
-            105.0,
+            104.0,
             47.0,
             self.maxStamina * 50.0,
             25.0,
         );
         let staminaRenderBox = FRect::new(
-            108.0,
+            107.0,
             50.0,
-            self.stamina * 50.0 - 8.0,
+            self.stamina * 50.0 - 6.0,
             19.0,
         );
         renderer.set_draw_color(Color::RGB(180, 180, 180));
         renderer.fill_rect(maxStaminaRenderBox).unwrap();
-        renderer.set_draw_color(Color::RGB(30, 130, 30));
-        renderer.fill_rect(staminaRenderBox).unwrap();
+        if self.stamina > 0.0 {
+            renderer.set_draw_color(Color::RGB(30, 130, 30));
+            renderer.fill_rect(staminaRenderBox).unwrap();
+        }
 
         let maxManaRenderBox = FRect::new(
-            105.0,
+            104.0,
             85.0,
             self.maxMana * 50.0,
             25.0,
         );
         let manaRenderBox = FRect::new(
-            108.0,
+            107.0,
             88.0,
             self.mana * 50.0 - 6.0,
             19.0,
         );
         renderer.set_draw_color(Color::RGB(180, 180, 180));
         renderer.fill_rect(maxManaRenderBox).unwrap();
-        renderer.set_draw_color(Color::RGB(80, 0, 140));
-        renderer.fill_rect(manaRenderBox).unwrap();
+        if self.mana > 0.0 {
+            renderer.set_draw_color(Color::RGB(80, 0, 140));
+            renderer.fill_rect(manaRenderBox).unwrap();
+        }
     }
 }
 
@@ -222,9 +228,9 @@ pub struct swordAttack {
     swingRight: [FRect; 6],
     pub hitBox: FRect,
     pub swingPhase: usize,
-    swingPhaseFloat: f32,
+    pub(crate) swingPhaseFloat: f32,
     pub direction: String,
-    swingCooldown: Instant,
+    pub(crate) swingCooldown: Instant,
     texturePos: usize,
 }
 
@@ -332,6 +338,7 @@ impl swordAttack{
         self.swingPhase = self.swingPhaseFloat.floor() as usize;
     }
 }
+
 pub struct enemy {
     pub x: f32,
     pub y: f32,
@@ -346,9 +353,9 @@ pub struct enemy {
     lastPhaseChange: Instant,
     pub render: bool,
     pub timeSinceHit: Instant,
-    roam: bool,
-    attacks: Box<attacks>,
-    roamPattern: Box<roamPattern>,
+    pub(crate) roam: bool,
+    attacks: attacks,
+    pub(crate) roamPattern: roamPattern,
     texturePos: usize
 }
 impl enemy {
@@ -367,8 +374,8 @@ impl enemy {
         render: true,
         timeSinceHit: Instant::now(),
         roam: true,
-        attacks: Box::new(attacks),
-        roamPattern: Box::new(roamPattern),
+        attacks,
+        roamPattern,
         texturePos
     }}
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, meshBox: &mut meshBox) {
@@ -393,6 +400,21 @@ impl enemy {
         self.hitBox.y -= self.hitBox.h / 2.0;
 
         renderer.copy(&textureVec[self.texturePos], rectSet[self.walkingPhase], self.hitBox).unwrap();
+    }
+    pub fn update(&mut self) {
+        /*if self.lastPhaseChange.elapsed().as_millis() >= 200 {
+            self.walkingPhase += 1;
+            if self.walkingPhase > 2 {
+                self.walkingPhase = 1;
+            }
+            self.lastPhaseChange = Instant::now();
+        }*/
+        if self.timeSinceHit.elapsed().as_millis() <= 250 {
+            self.render = !self.render;
+        }
+        else {
+            self.render = true;
+        }
     }
     pub fn updatePosition(&mut self, x: f32, y: f32, backgroundTexture: &Texture) {
         self.x += x;

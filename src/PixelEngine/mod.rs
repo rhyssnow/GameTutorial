@@ -12,14 +12,15 @@ use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::keyboard::Scancode;
 use sdl3::pixels::Color;
 use sdl3::video::Window;
-
+use std::mem;
+use serde_json::Value::Null;
 use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter};
 
 pub struct pixelEngine {
     meshBox: meshBox,
     mainCharacter: mainCharacter,
     enemies: Vec<enemy>,
-    alive: bool,
+    pub(crate) alive: bool,
 }
 
 impl pixelEngine {
@@ -33,11 +34,8 @@ impl pixelEngine {
         let mut arrowKeys = false;
         let mut usedStamina = false;
 
-        if (keyboardState.is_scancode_pressed(Scancode::LShift) || keyboardState.is_scancode_pressed(Scancode::RShift)) && self.mainCharacter.stats.stamina > 0.0 {
-            speed *= 1.5;
-            self.mainCharacter.stats.stamina -= 0.05;
-            usedStamina = true;
-        }
+        let mut moveBackInDirection = Vec::new();
+        let mut moveMainInDirection = Vec::new();
 
         if keyboardState.is_scancode_pressed(Scancode::Up){
             self.mainCharacter.direction = "up".to_string();
@@ -65,11 +63,11 @@ impl pixelEngine {
             if !arrowKeys {
                 self.mainCharacter.direction = "up".to_string();
             }
-            if self.meshBox.endeOfDirection.contains(&"up".to_string()) || self.mainCharacter.y > window.size_in_pixels().1 as f32 / 2.0 {
-                self.mainCharacter.updatePosition(0.0, -5.0 * speed, window);
+            if self.meshBox.endOfDirection.contains(&"up".to_string()) || self.mainCharacter.y > window.size_in_pixels().1 as f32 / 2.0 {
+                moveMainInDirection.push("up".to_string());
             }
             else {
-                self.meshBox.updatePosition(0.0, -1.0 * speed, &textureVec[self.meshBox.texturePos]);
+                moveBackInDirection.push("up".to_string());
             }
         }
         if keyboardState.is_scancode_pressed(Scancode::S) && !keyboardState.is_scancode_pressed(Scancode::W)  {
@@ -77,11 +75,11 @@ impl pixelEngine {
             if !arrowKeys {
                 self.mainCharacter.direction = "down".to_string();
             }
-            if self.meshBox.endeOfDirection.contains(&"down".to_string()) || self.mainCharacter.y > window.size_in_pixels().1 as f32 / 2.0 {
-                self.mainCharacter.updatePosition(0.0, 5.0 * speed, window);
+            if self.meshBox.endOfDirection.contains(&"down".to_string()) || self.mainCharacter.y < window.size_in_pixels().1 as f32 / 2.0 {
+                moveMainInDirection.push("down".to_string());
             }
             else {
-                self.meshBox.updatePosition(0.0, 1.0 * speed, &textureVec[self.meshBox.texturePos]);
+                moveBackInDirection.push("down".to_string());
             }
         }
         if keyboardState.is_scancode_pressed(Scancode::A) && !keyboardState.is_scancode_pressed(Scancode::D)  {
@@ -89,11 +87,11 @@ impl pixelEngine {
             if !arrowKeys {
                 self.mainCharacter.direction = "left".to_string();
             }
-            if self.meshBox.endeOfDirection.contains(&"left".to_string()) || self.mainCharacter.y > window.size_in_pixels().1 as f32 / 2.0 {
-                self.mainCharacter.updatePosition(-5.0 * speed, 0.0, window);
+            if self.meshBox.endOfDirection.contains(&"left".to_string()) || self.mainCharacter.x > window.size_in_pixels().0 as f32 / 2.0 -35.0 {
+                moveMainInDirection.push("left".to_string());
             }
             else {
-                self.meshBox.updatePosition(-1.0 * speed, 0.0, &textureVec[self.meshBox.texturePos]);
+                moveBackInDirection.push("left".to_string());
             }
         }
         if keyboardState.is_scancode_pressed(Scancode::D) && !keyboardState.is_scancode_pressed(Scancode::A)  {
@@ -101,11 +99,55 @@ impl pixelEngine {
             if !arrowKeys {
                 self.mainCharacter.direction = "right".to_string();
             }
-            if self.meshBox.endeOfDirection.contains(&"right".to_string()) || self.mainCharacter.y > window.size_in_pixels().1 as f32 / 2.0 {
-                self.mainCharacter.updatePosition(5.0 * speed, 0.0, window);
+            if self.meshBox.endOfDirection.contains(&"right".to_string()) || self.mainCharacter.x < window.size_in_pixels().0 as f32 / 2.0 -35.0 {
+                moveMainInDirection.push("right".to_string());
             }
             else {
-                self.meshBox.updatePosition(1.0 * speed, 0.0, &textureVec[self.meshBox.texturePos]);
+                moveBackInDirection.push("right".to_string());
+            }
+        }
+
+        if (keyboardState.is_scancode_pressed(Scancode::LShift) || keyboardState.is_scancode_pressed(Scancode::RShift)) && walking == true {
+            usedStamina = true;
+            if self.mainCharacter.stats.stamina > 0.0 {
+                speed *= 1.5;
+                self.mainCharacter.stats.stamina -= 0.05;
+            }
+        }
+
+        if keyboardState.is_scancode_pressed(Scancode::X) && self.mainCharacter.swordAttack.swingCooldown.elapsed().as_millis() > 350 && self.mainCharacter.stats.stamina > 1.0 {
+            self.mainCharacter.swordAttack.swingPhase = 0;
+            self.mainCharacter.swordAttack.swingPhaseFloat = 0.0;
+            self.mainCharacter.swordAttack.direction = self.mainCharacter.direction.clone();
+            self.mainCharacter.stats.stamina -= 3.0;
+            self.mainCharacter.swordAttack.swingCooldown = Instant::now();
+            usedStamina = true;
+        }
+
+        let directions = [moveBackInDirection.clone(), moveMainInDirection.clone()].concat();
+        if !directions.contains(&self.mainCharacter.direction){
+            speed /= 3.0;
+        }
+        if (directions.contains(&"up".to_string()) || directions.contains(&"down".to_string())) && (directions.contains(&"left".to_string())  || directions.contains(&"right".to_string())) {
+            speed /= 1.5;
+        }
+
+        for direction in moveMainInDirection {
+            match direction.as_str() {
+                "up" => self.mainCharacter.updatePosition(0.0, -5.0 * speed, window),
+                "down" => self.mainCharacter.updatePosition(0.0, 5.0 * speed, window),
+                "left" => self.mainCharacter.updatePosition(-5.0 * speed, 0.0, window),
+                "right" => self.mainCharacter.updatePosition(5.0 * speed, 0.0, window),
+                &_ => {}
+            }
+        }
+        for direction in moveBackInDirection {
+            match direction.as_str() {
+                "up" => self.meshBox.updatePosition(0.0, -1.0 * speed, &textureVec[self.meshBox.texturePos]),
+                "down" => self.meshBox.updatePosition(0.0, 1.0 * speed, &textureVec[self.meshBox.texturePos]),
+                "left" => self.meshBox.updatePosition(-1.0 * speed, 0.0, &textureVec[self.meshBox.texturePos]),
+                "right" => self.meshBox.updatePosition(1.0 * speed, 0.0, &textureVec[self.meshBox.texturePos]),
+                &_ => {}
             }
         }
 
@@ -122,6 +164,17 @@ impl pixelEngine {
                 self.mainCharacter.stats.stamina += 0.05;
             }
         }
+
+        if self.mainCharacter.stats.stamina > self.mainCharacter.stats.maxStamina {
+            self.mainCharacter.stats.stamina = self.mainCharacter.stats.maxStamina;
+        }
+        if self.mainCharacter.stats.mana > self.mainCharacter.stats.maxMana {
+            self.mainCharacter.stats.mana = self.mainCharacter.stats.maxMana;
+        }
+        if self.mainCharacter.stats.health > self.mainCharacter.stats.maxHealth {
+            self.mainCharacter.stats.health = self.mainCharacter.stats.maxHealth;
+        }
+
         for event in eventPump.poll_iter() {
             use sdl3::event::Event;
             match event {
@@ -133,8 +186,9 @@ impl pixelEngine {
         }
     }
     pub fn update(&mut self,  textureVec: &Vec<Texture>) {
-        for enemy in self.enemies.iter_mut() {
+        for mut enemy in self.enemies.iter_mut() {
             //add enemy movement updates here
+            self.mainCharacter.update();
             if hitboxDetector(enemy.hitBox, self.mainCharacter.hitBox) && !self.mainCharacter.immune {
                 self.mainCharacter.timeSinceHit = Instant::now();
                 self.mainCharacter.stats.health -= 2.0;
@@ -174,6 +228,7 @@ impl pixelEngine {
                 enemy.updatePosition(-mx, -my, &textureVec[self.meshBox.texturePos]);
                 enemy.timeSinceHit = Instant::now();
             }
+            enemy.update();
         }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {

@@ -5,7 +5,8 @@
     ]}
   ],
   "enemies" : [
+    {"enemyType" : "wolf", "x" : 500, "y" : 100},
     {"enemyType" : "wolf", "x" : 100, "y" : 100},
-    {"enemyType" : "wolf", "x" : 10, "y" : 10}
+    {"enemyType" : "wolf", "x" : 300, "y" : 300}
   ]
 }

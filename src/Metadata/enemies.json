@@ -1,6 +1,6 @@
 {
   "wolf": [
-    { "roamType" : "squarePace", "attackType" : "missile",  "up" : [
+    { "roamType" : "instantAttack", "attackType" : "missile",  "up" : [
         {"x" : 17.0, "y" : 29.0, "w" : 14.0, "h" : 27.0},
         {"x" : 32.0, "y" : 29.0, "w" : 14.0, "h" : 27.0}
       ], "down" : [
