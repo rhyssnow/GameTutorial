@@ -75,7 +75,11 @@ pub struct mainCharacter{
     pub immune: bool,
     pub render: bool,
     pub timeSinceHit: Instant,
-    texturePos: usize
+    pub timeSinceJumped: Instant,
+    texturePos: usize,
+    pub jumping: bool,
+    height: f32,
+    pub velocity: f32,
 }
 impl mainCharacter {
     pub fn new(x: f32, y: f32, health: f32) -> mainCharacter {mainCharacter{
@@ -94,7 +98,11 @@ impl mainCharacter {
         immune: false,
         render: true,
         timeSinceHit: Instant::now(),
-        texturePos: 0
+        texturePos: 0,
+        timeSinceJumped: Instant::now(),
+        jumping: false,
+        height: 0.0,
+        velocity: 0.0,
     }}
     pub fn walkPhaseChange(&mut self) {
         if self.lastPhaseChange.elapsed().as_millis() >= 200 {
@@ -114,23 +122,77 @@ impl mainCharacter {
             self.immune = false;
             self.render = true;
         }
+        if self.velocity != 0.0 {
+            self.jumping = true;
+        }
+        else {
+            self.jumping = false;
+        }
+        if self.jumping {
+            self.immune = true;
+            self.velocity -= 0.2;
+            self.height += self.velocity;
+            println!("{}", self.velocity);
+            if self.height <= 0.0 {
+                self.jumping = false;
+                self.velocity = 0.0;
+                self.height = 0.0;
+                self.timeSinceJumped = Instant::now();
+            }
+        }
     }
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas) {
         self.hitBox.x = self.x;
         self.hitBox.y = self.y;
 
-        let rectSet = match self.direction.as_str() {
-            "up" => self.characterUp,
-            "down" => self.characterDown,
-            "right" => self.characterRight,
-            "left" => self.characterLeft,
-            _ => self.characterDown
-        };
+        if !self.jumping {
+            let rectSet = match self.direction.as_str() {
+                "up" => self.characterUp,
+                "down" => self.characterDown,
+                "right" => self.characterRight,
+                "left" => self.characterLeft,
+                _ => self.characterDown
+            };
 
-        self.hitBox.w = rectSet[self.walkingPhase].w * 7.0;
-        self.hitBox.h = rectSet[self.walkingPhase].h * 7.0;
+            self.hitBox.w = rectSet[self.walkingPhase].w * 7.0;
+            self.hitBox.h = rectSet[self.walkingPhase].h * 7.0;
+            renderer.copy(&textureVec[self.texturePos], rectSet[self.walkingPhase], self.hitBox).unwrap();
+        }
 
-        renderer.copy(&textureVec[self.texturePos], rectSet[self.walkingPhase], self.hitBox).unwrap();
+        if self.jumping {
+
+            let mut mainCharacterRect = FRect::new(15.0, 66.0, 10.0, 15.0);
+            mainCharacterRect.y += match self.direction.as_str() {
+                "up" => 32.0,
+                "down" => 48.0,
+                "right" => 16.0,
+                "left" => 0.0,
+                _ => 2.0
+            };
+
+            if self.direction == "up" || self.direction == "down"{
+                mainCharacterRect.w -= 1.0;
+            }
+
+            self.hitBox.w = mainCharacterRect.w * 7.0;
+            self.hitBox.h = mainCharacterRect.h * 7.0;
+
+            let mut mainCharacterRenderRect = self.hitBox;
+            mainCharacterRenderRect.y -= self.height;
+
+            let mut shadowRect = FRect::new(0.0, 66.0, 10.0, 15.0);
+
+            shadowRect.x = match self.direction.as_str() {
+                "up" => 2.0,
+                "down" => 2.0,
+                "right" => 0.0,
+                "left" => 3.0,
+                _ => 2.0
+            };
+            renderer.copy(&textureVec[self.texturePos], shadowRect, self.hitBox).unwrap();
+
+            renderer.copy(&textureVec[self.texturePos], mainCharacterRect, mainCharacterRenderRect).unwrap();
+        }
     }
     pub fn updatePosition(&mut self, x: f32, y: f32, window: &Window) {
         self.x += x;
@@ -245,7 +307,7 @@ impl swordAttack{
         swingPhaseFloat: 6.0,
         direction,
         swingCooldown: Instant::now(),
-        texturePos: 2
+        texturePos: 2,
     }}
     pub fn render (&mut self, renderer: &mut WindowCanvas, characterX: f32, characterY: f32, textureVec: &Vec<Texture>) {
         if self.swingPhase == 6 {
@@ -317,6 +379,7 @@ impl swordAttack{
             }
             _ => 0.0,
         };
+
 
         self.hitBox = match self.direction.as_str() {
             "up" => FRect { x: renderX, y: renderY, w: self.swingUp[self.swingPhase].w * 7.0, h: self.swingUp[self.swingPhase].h * 7.0 },

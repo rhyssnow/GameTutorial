@@ -73,7 +73,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
 
         let mut elapsed = now.elapsed().as_millis();
         if elapsed > 16 {
-            elapsed = 0;
+            elapsed = 16;
         }
         let extraTime = 16 - elapsed;
         delay(extraTime as u32);

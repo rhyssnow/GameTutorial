@@ -35,6 +35,20 @@ impl pixelEngine {
         let mut moveBackInDirection = Vec::new();
         let mut moveMainInDirection = Vec::new();
 
+        if keyboardState.is_scancode_pressed(Scancode::Space) && !self.mainCharacter.jumping && self.mainCharacter.stats.stamina > 1.0 && self.mainCharacter.timeSinceJumped.elapsed().as_millis() > 100 {
+            self.mainCharacter.velocity = 10.0;
+            self.mainCharacter.stats.stamina -= 2.5;
+            usedStamina = true;
+        }
+        if self.mainCharacter.jumping {
+            usedStamina = true;
+            speed *= 1.2;
+        }
+
+        if !keyboardState.is_scancode_pressed(Scancode::Space) && self.mainCharacter.jumping && self.mainCharacter.velocity > 0.0 {
+            self.mainCharacter.velocity = 0.000000001;
+        }
+
         if keyboardState.is_scancode_pressed(Scancode::Up){
             self.mainCharacter.direction = "up".to_string();
             arrowKeys = true;
@@ -113,7 +127,7 @@ impl pixelEngine {
             }
         }
 
-        if keyboardState.is_scancode_pressed(Scancode::X) && self.mainCharacter.swordAttack.swingCooldown.elapsed().as_millis() > 350 && self.mainCharacter.stats.stamina > 1.0 {
+        if keyboardState.is_scancode_pressed(Scancode::X) && self.mainCharacter.swordAttack.swingCooldown.elapsed().as_millis() > 350 && self.mainCharacter.stats.stamina > 1.0 && !self.mainCharacter.jumping{
             self.mainCharacter.swordAttack.swingPhase = 0;
             self.mainCharacter.swordAttack.swingPhaseFloat = 0.0;
             self.mainCharacter.swordAttack.direction = self.mainCharacter.direction.clone();
@@ -195,6 +209,7 @@ impl pixelEngine {
             if hitboxDetector(enemyUsedHitbox, self.mainCharacter.hitBox) && !self.mainCharacter.immune {
                 self.mainCharacter.timeSinceHit = Instant::now();
                 self.mainCharacter.stats.health -= 2.0;
+                self.mainCharacter.immune = true;
                 if self.mainCharacter.stats.health <= 0.0 {
                     self.alive = false;
                 }
