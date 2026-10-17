@@ -344,14 +344,14 @@ pub struct enemy {
     pub x: f32,
     pub y: f32,
     pub(crate) direction: String,
-    walkingPhase: usize,
+    pub(crate) walkingPhase: usize,
     enemyUp: Vec<FRect>,
     enemyDown: Vec<FRect>,
     enemyRight: Vec<FRect>,
     enemyLeft: Vec<FRect>,
     pub hitBox: FRect,
     pub health: f32,
-    lastPhaseChange: Instant,
+    pub(crate) lastPhaseChange: Instant,
     pub render: bool,
     pub timeSinceHit: Instant,
     pub(crate) roam: bool,
@@ -403,13 +403,6 @@ impl enemy {
         renderer.copy(&textureVec[self.texturePos], rectSet[self.walkingPhase], self.hitBox).unwrap();
     }
     pub fn update(&mut self) {
-        /*if self.lastPhaseChange.elapsed().as_millis() >= 200 {
-            self.walkingPhase += 1;
-            if self.walkingPhase > 2 {
-                self.walkingPhase = 1;
-            }
-            self.lastPhaseChange = Instant::now();
-        }*/
         if self.timeSinceHit.elapsed().as_millis() <= 250 {
             self.render = !self.render;
         }

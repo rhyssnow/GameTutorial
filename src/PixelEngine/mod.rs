@@ -186,7 +186,6 @@ impl pixelEngine {
     pub fn update(&mut self,  textureVec: &Vec<Texture>) {
         self.mainCharacter.update();
         for mut enemy in self.enemies.iter_mut() {
-            //add enemy movement updates here
             let enemyUsedHitbox = FRect::new(
                 enemy.hitBox.x + enemy.hitBox.w * 0.1,
                 enemy.hitBox.y + enemy.hitBox.h * 0.1,
@@ -201,7 +200,7 @@ impl pixelEngine {
                 }
             }
             if hitboxDetector(enemy.hitBox, self.mainCharacter.swordAttack.hitBox) {
-                let speed = 2.0;
+                let speed = 1.0;
                 let mainPosX = self.mainCharacter.x + self.meshBox.x * 6.0;
                 let mainPosY = self.mainCharacter.y + self.meshBox.y * 6.0;
 
@@ -250,7 +249,7 @@ impl pixelEngine {
                 removeEnemy.push(enemy);
             }
         }
-        removeEnemy.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        removeEnemy.sort_by(|a, b| b.cmp(a));
         for enemy in removeEnemy {
             self.enemies.remove(enemy);
         }

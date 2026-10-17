@@ -1,3 +1,4 @@
+use std::time::Instant;
 use sdl3::render::Texture;
 use crate::PixelEngine::basic::{enemy, mainCharacter, meshBox};
 
@@ -16,7 +17,15 @@ impl attacks {
     }
 }
 fn missileAttack (mainCharacter: &mainCharacter, backgroundTexture: &Texture, meshBox: &meshBox, enemy: &mut enemy) {
-    let speed = 0.7;
+    if enemy.lastPhaseChange.elapsed().as_millis() >= 200 {
+        enemy.walkingPhase += 1;
+        if enemy.walkingPhase > 1 {
+            enemy.walkingPhase = 0;
+        }
+        enemy.lastPhaseChange = Instant::now();
+    }
+
+    let speed = 1.0;
     let mainPosX = mainCharacter.x + meshBox.x * 6.0;
     let mainPosY = mainCharacter.y + meshBox.y * 6.0;
 
