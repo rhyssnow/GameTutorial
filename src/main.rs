@@ -4,7 +4,7 @@
 mod PixelEngine;
 
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 use sdl3::pixels::Color;
@@ -46,6 +46,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
     textureSword.set_scale_mode(sdl3::render::ScaleMode::Nearest);
     textureVec.push(textureSword);
 
+    let mut score = 0;
     let save = loadSaveFromJson(&window);
     let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*save.1 + ".json"))));
 
@@ -68,7 +69,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
         let now = Instant::now();
 
         pixelEngine.input(&window, &textureVec, &mut running);
-        pixelEngine.update(&textureVec);
+        pixelEngine.update(&mut textureVec, renderer, &mut score);
         pixelEngine.render(&textureVec, renderer, &window);
 
         let mut elapsed = now.elapsed().as_millis();
@@ -86,6 +87,9 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
 
     let gameOverSurface = font.render("You Died").blended(Color::RGB(150, 50, 50)).unwrap();
     let gameOverTexture = renderer.create_texture_from_surface(&gameOverSurface).unwrap();
+
+    let scoreSurface = font.render(&*("Score: ".to_string() + &*score.to_string())).blended(Color::RGB(200, 200, 200)).unwrap();
+    let scoreTexture = renderer.create_texture_from_surface(&scoreSurface).unwrap();
 
     let mut file = File::open("src/Assets/highscore.txt").unwrap(); //here
     let mut buffer = String::new();
@@ -114,12 +118,30 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
         );
 
         renderer.copy(&gameOverTexture, None, deathMsgRect).unwrap();
+        renderer.copy(&scoreTexture, None, highScoreMsgRect).unwrap();
         highScoreMsgRect.y += highScoreMsgRect.h + 50.0;
         highScoreMsgRect.h /= 1.5;
         renderer.copy(&highScoreTexture, None, highScoreMsgRect).unwrap();
 
-
-
         renderer.present();
+        gameoverInput(&mut running);
+    }
+    if score > buffer.parse::<i32>().unwrap() {
+        let mut newFile = File::create("src/Assets/highscore.txt").unwrap(); //here
+        newFile.write_all(&score.to_string().as_bytes()).unwrap();
+    }
+}
+
+fn gameoverInput (running: &mut bool) {
+    let mut eventPump = sdl3::init().unwrap().event_pump().unwrap();
+
+    for event in eventPump.poll_iter() {
+        use sdl3::event::Event;
+        match event {
+            Event::Quit { .. } =>  {
+                *running = false;
+            }
+            _ => {}
+        }
     }
 }

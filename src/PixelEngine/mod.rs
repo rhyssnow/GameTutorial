@@ -45,8 +45,8 @@ impl pixelEngine {
             speed *= 1.2;
         }
 
-        if !keyboardState.is_scancode_pressed(Scancode::Space) && self.mainCharacter.jumping && self.mainCharacter.velocity > 0.0 {
-            self.mainCharacter.velocity = 0.000000001;
+        if !keyboardState.is_scancode_pressed(Scancode::Space) && self.mainCharacter.jumping && self.mainCharacter.velocity > 0.1 {
+            self.mainCharacter.velocity = 0.1;
         }
 
         if keyboardState.is_scancode_pressed(Scancode::Up){
@@ -197,7 +197,7 @@ impl pixelEngine {
             }
         }
     }
-    pub fn update(&mut self,  textureVec: &Vec<Texture>) {
+    pub fn update(&mut self, mut textureVec: &mut Vec<Texture>, renderer: &WindowCanvas, score: &mut i32) {
         self.mainCharacter.update();
         for mut enemy in self.enemies.iter_mut() {
             let enemyUsedHitbox = FRect::new(
@@ -258,6 +258,9 @@ impl pixelEngine {
                 enemiesClone[enemyPos].attacks.attack(&mut self.mainCharacter, &mut self.meshBox, &mut self.enemies[enemyPos], &textureVec[texturePos]);
             }
         }
+        for mut trigger in self.meshBox.triggers.iter_mut() {
+            trigger.trigger(&mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer);
+        }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {
             if self.enemies[enemy].health < 0.0 {
@@ -266,6 +269,7 @@ impl pixelEngine {
         }
         removeEnemy.sort_by(|a, b| b.cmp(a));
         for enemy in removeEnemy {
+            *score +=1;
             self.enemies.remove(enemy);
         }
     }

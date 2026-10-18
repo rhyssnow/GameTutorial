@@ -17,7 +17,7 @@ pub struct meshBox {
     width: f32,
     height: f32,
     pub endOfDirection: Vec<String>,
-    triggers: Vec<trigger>,
+    pub(crate) triggers: Vec<trigger>,
     pub texturePos: usize
 }
 
@@ -132,7 +132,6 @@ impl mainCharacter {
             self.immune = true;
             self.velocity -= 0.2;
             self.height += self.velocity;
-            println!("{}", self.velocity);
             if self.height <= 0.0 {
                 self.jumping = false;
                 self.velocity = 0.0;
