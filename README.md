@@ -1,0 +1,1 @@
+This project has been made on a linux system, and has not been tested on other systems. Also, you will need to install sdl3 on your system before the game works, because I was too lazy to build it into the file structure.
