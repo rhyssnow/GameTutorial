@@ -42,7 +42,6 @@ impl pixelEngine {
         }
         if self.mainCharacter.jumping {
             usedStamina = true;
-            speed *= 1.2;
         }
 
         if !keyboardState.is_scancode_pressed(Scancode::Space) && self.mainCharacter.jumping && self.mainCharacter.velocity > 0.1 {
@@ -122,8 +121,14 @@ impl pixelEngine {
         if (keyboardState.is_scancode_pressed(Scancode::LShift) || keyboardState.is_scancode_pressed(Scancode::RShift)) && walking == true {
             usedStamina = true;
             if self.mainCharacter.stats.stamina > 0.0 {
-                speed *= 1.5;
-                self.mainCharacter.stats.stamina -= 0.05;
+                if self.mainCharacter.jumping {
+                    speed *= 1.3;
+                    self.mainCharacter.stats.stamina -= 0.035;
+                }
+                else{
+                    speed *= 1.25;
+                    self.mainCharacter.stats.stamina -= 0.05;
+                }
             }
         }
 
@@ -197,7 +202,7 @@ impl pixelEngine {
             }
         }
     }
-    pub fn update(&mut self, mut textureVec: &mut Vec<Texture>, renderer: &WindowCanvas, score: &mut i32) {
+    pub fn update(&mut self, mut textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window) {
         self.mainCharacter.update();
         for mut enemy in self.enemies.iter_mut() {
             let enemyUsedHitbox = FRect::new(
@@ -259,7 +264,7 @@ impl pixelEngine {
             }
         }
         for mut trigger in self.meshBox.triggers.iter_mut() {
-            trigger.trigger(&mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer);
+            trigger.trigger(&mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, self.meshBox.x, self.meshBox.y);
         }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {
@@ -269,7 +274,6 @@ impl pixelEngine {
         }
         removeEnemy.sort_by(|a, b| b.cmp(a));
         for enemy in removeEnemy {
-            *score +=1;
             self.enemies.remove(enemy);
         }
     }

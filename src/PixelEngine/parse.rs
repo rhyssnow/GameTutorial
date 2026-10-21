@@ -84,6 +84,12 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                     frect["h"].as_f64().unwrap() as f32,
                 ))
             }
+            let roamArea = FRect::new(
+                enemy["roamX"].as_f64().unwrap() as f32,
+                enemy["roamY"].as_f64().unwrap() as f32,
+                enemy["roamW"].as_f64().unwrap() as f32,
+                enemy["roamH"].as_f64().unwrap() as f32,
+            );
             enemies.push(enemy::new(
                 enemy["x"].as_f64().unwrap() as f32,
                 enemy["y"].as_f64().unwrap() as f32,
@@ -92,7 +98,7 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                 left,
                 right,
                 attacks::new(enemyType["attackType"].as_str().unwrap().to_string()),
-                roamPattern::new(enemyType["roamType"].as_str().unwrap().to_string()),
+                roamPattern::new(enemyType["roamType"].as_str().unwrap().to_string(), roamArea),
                 texturePos.clone()
             ));
             textureVec.push("src/Assets/".to_string() + enemyType["textureFile"].as_str().unwrap());

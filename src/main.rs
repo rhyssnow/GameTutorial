@@ -3,32 +3,26 @@
 
 mod PixelEngine;
 
-use std::fs::File;
-use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 use sdl3::pixels::Color;
-use sdl3::render::{create_renderer, WindowCanvas, FRect};
+use sdl3::render::{create_renderer, WindowCanvas, FRect, Texture};
 use sdl3::surface::Surface;
 use sdl3::timer::delay;
 use sdl3::video::Window;
-
+use crate::PixelEngine::basic::mainCharacter;
 use crate::PixelEngine::pixelEngine;
 use crate::PixelEngine::parse::{createEnvironmentFromJson, loadSaveFromJson};
 
 fn main() {
     let videoSubsystem = sdl3::init().unwrap().video().unwrap();
-    let window = videoSubsystem.window("Game", 1920, 1080).position_centered().resizable().opengl().build().unwrap();
+    let mut window = videoSubsystem.window("Game", 1920, 1080).position_centered().resizable().opengl().build().unwrap();
     let mut renderer = create_renderer(window.clone(), None).unwrap();
 
     renderer.set_draw_color(Color::RGB(255, 255, 255));
     renderer.clear();
     renderer.present();
 
-    gameLoop(&mut renderer, window);
-}
-
-fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
     let mut textureVec = Vec::new();
 
     let surfaceMain = Surface::load_png("src/Assets/gameCharacter.png").unwrap();
@@ -46,9 +40,12 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
     textureSword.set_scale_mode(sdl3::render::ScaleMode::Nearest);
     textureVec.push(textureSword);
 
-    let mut score = 0;
     let save = loadSaveFromJson(&window);
-    let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*save.1 + ".json"))));
+    gameLoop(&mut renderer, &mut window, &mut textureVec, save.0, save.1, save.2, save.3);
+}
+
+fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &mut Vec<Texture>, mainCharacter: mainCharacter, environmentFile: String, startX: f32, startY: f32) {
+    let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*environmentFile+ ".json"))));
 
     for location in environment.0 {
         let surface = Surface::load_png(location).unwrap();
@@ -58,18 +55,18 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
     }
 
     let mut meshBox = environment.1;
-    meshBox.x = save.2;
-    meshBox.y = save.3;
+    meshBox.x = startX;
+    meshBox.y = startY;
 
-    let mut pixelEngine = pixelEngine::new(meshBox, save.0, environment.2);
+    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2);
 
     let mut running = true;
 
     while running && pixelEngine.alive {
         let now = Instant::now();
 
-        pixelEngine.input(&window, &textureVec, &mut running);
-        pixelEngine.update(&mut textureVec, renderer, &mut score);
+        pixelEngine.input(window, &textureVec, &mut running);
+        pixelEngine.update(&mut textureVec, renderer, window);
         pixelEngine.render(&textureVec, renderer, &window);
 
         let mut elapsed = now.elapsed().as_millis();
@@ -88,17 +85,6 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
     let gameOverSurface = font.render("You Died").blended(Color::RGB(150, 50, 50)).unwrap();
     let gameOverTexture = renderer.create_texture_from_surface(&gameOverSurface).unwrap();
 
-    let scoreSurface = font.render(&*("Score: ".to_string() + &*score.to_string())).blended(Color::RGB(200, 200, 200)).unwrap();
-    let scoreTexture = renderer.create_texture_from_surface(&scoreSurface).unwrap();
-
-    let mut file = File::open("src/Assets/highscore.txt").unwrap(); //here
-    let mut buffer = String::new();
-    file.read_to_string(&mut buffer).unwrap();
-
-    let highScoreSurface = font.render(&*("High Score: ".to_string() + &buffer)).blended(Color::RGB(200, 200, 200)).unwrap();
-    let highScoreTexture = renderer.create_texture_from_surface(&highScoreSurface).unwrap();
-
-
     while running {
         renderer.set_draw_color(Color::RGB(0, 0, 0));
         renderer.clear();
@@ -110,29 +96,15 @@ fn gameLoop(renderer: &mut WindowCanvas, window: Window) {
             window.size_in_pixels().0 as f32 / 2.0,
             window.size_in_pixels().1 as f32 / 3.0,
         );
-        let mut highScoreMsgRect = FRect::new(
-            deathMsgRect.x + deathMsgRect.w / 3.0,
-            deathMsgRect.y + deathMsgRect.h + 50.0,
-            deathMsgRect.w / 3.0,
-            deathMsgRect.h / 3.0,
-        );
 
         renderer.copy(&gameOverTexture, None, deathMsgRect).unwrap();
-        renderer.copy(&scoreTexture, None, highScoreMsgRect).unwrap();
-        highScoreMsgRect.y += highScoreMsgRect.h + 50.0;
-        highScoreMsgRect.h /= 1.5;
-        renderer.copy(&highScoreTexture, None, highScoreMsgRect).unwrap();
 
         renderer.present();
-        gameoverInput(&mut running);
-    }
-    if score > buffer.parse::<i32>().unwrap() {
-        let mut newFile = File::create("src/Assets/highscore.txt").unwrap(); //here
-        newFile.write_all(&score.to_string().as_bytes()).unwrap();
+        gameOverInput(&mut running);
     }
 }
 
-fn gameoverInput (running: &mut bool) {
+fn gameOverInput (running: &mut bool) {
     let mut eventPump = sdl3::init().unwrap().event_pump().unwrap();
 
     for event in eventPump.poll_iter() {

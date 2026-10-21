@@ -1,12 +1,13 @@
 {
   "meshBox" : [
     {"background" : "src/Assets/grass.png", "triggers" : [
-      {"triggerType": "spawnWolfAlways", "x" : 0, "y" : 0, "w" : 0, "h" : 0}
+      {"triggerType":  "newAreatestarea", "x": 206, "y": 990, "w": 82, "h": 10}
     ]}
   ],
   "enemies" : [
-    {"enemyType" : "wolf", "x" : 500, "y" : 100},
-    {"enemyType" : "wolf", "x" : 100, "y" : 100},
-    {"enemyType" : "wolf", "x" : 300, "y" : 300}
+    {"enemyType" : "wolfPace", "x" : 580, "y" : 218, "roamX": 475, "roamY": 218, "roamW": 130, "roamH": 0},
+    {"enemyType" : "wolfPace", "x" : 850, "y" : 218, "roamX": 750, "roamY": 218, "roamW": 130, "roamH": 0},
+    {"enemyType" : "wolfMissile", "x" : 850, "y" : 600, "roamX": 770, "roamY": 545, "roamW": 150, "roamH": 95},
+    {"enemyType" : "wolfMissile", "x" : 660, "y" : 755, "roamX": 635, "roamY": 735, "roamW": 75, "roamH": 30}
   ]
 }

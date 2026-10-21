@@ -59,6 +59,7 @@ impl meshBox {
     }
 }
 
+#[derive(Clone)]
 pub struct mainCharacter{
     pub x: f32,
     pub y: f32,
@@ -211,6 +212,8 @@ impl mainCharacter {
         }
     }
 }
+
+#[derive(Clone)]
 pub struct stats {
     pub health: f32,
     pub(crate) maxHealth: f32,
@@ -282,6 +285,7 @@ impl stats {
     }
 }
 
+#[derive(Clone)]
 pub struct swordAttack {
     swingUp: [FRect; 6],
     swingDown: [FRect; 6],
