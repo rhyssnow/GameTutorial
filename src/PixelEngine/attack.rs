@@ -25,7 +25,7 @@ fn missileAttack (mainCharacter: &mainCharacter, backgroundTexture: &Texture, me
         enemy.lastPhaseChange = Instant::now();
     }
 
-    let speed = 1.0;
+    let speed = 0.7;
     let mainPosX = mainCharacter.x + meshBox.x * 6.0;
     let mainPosY = mainCharacter.y + meshBox.y * 6.0;
 

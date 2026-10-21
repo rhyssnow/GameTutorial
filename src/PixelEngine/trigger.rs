@@ -12,7 +12,7 @@ pub struct trigger {
 
 impl trigger {
     pub fn new(triggerType: String, mut area: FRect) -> trigger { trigger{triggerType, area}}
-    pub fn trigger(&mut self, mainCharacter: &mut mainCharacter, mut enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, meshBoxX: f32, meshBoxY: f32) {
+    pub fn trigger(&mut self, mainCharacter: &mut mainCharacter, mut enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, meshBoxX: f32, meshBoxY: f32, running: &mut bool) {
         let mut newArea = false;
         let mut file = String::new();
         let mut index = 0;
@@ -49,7 +49,7 @@ impl trigger {
         );
 
         if newArea {
-            loadNewArea(file, &hitbox, renderer, window, mainCharacter, textureVec);
+            loadNewArea(file, &hitbox, renderer, window, mainCharacter, textureVec, running);
         }
 
         match self.triggerType.as_str() {
@@ -58,11 +58,13 @@ impl trigger {
     }
 }
 
-fn loadNewArea (file: String, area: &FRect, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mainCharacter, textureVec: &mut Vec<Texture>) {
+fn loadNewArea (file: String, area: &FRect, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool) {
     if hitboxDetector(mainCharacter.hitBox, *area) {
         while textureVec.len() > 3 {
             textureVec.pop().unwrap();
         }
-        gameLoop(renderer, window, textureVec, mainCharacter.clone(), file, 0.0, 0.0);
+        //update values instead of re-calling gameloop.as
+
+        gameLoop(renderer, window, textureVec, mainCharacter.clone(), file, 0.0, 0.0, running);
     }
 }

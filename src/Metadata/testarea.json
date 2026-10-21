@@ -1,7 +1,7 @@
 {
   "meshBox" : [
     {"background" : "src/Assets/grass.png", "triggers" : [
-      {"triggerType":  "newAreatestarea", "x": 206, "y": 990, "w": 82, "h": 10}
+      {"triggerType":  "newAreatestarea", "x": 206, "y": 0, "w": 82, "h": 0}
     ]}
   ],
   "enemies" : [

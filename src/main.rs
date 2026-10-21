@@ -41,10 +41,11 @@ fn main() {
     textureVec.push(textureSword);
 
     let save = loadSaveFromJson(&window);
-    gameLoop(&mut renderer, &mut window, &mut textureVec, save.0, save.1, save.2, save.3);
+    let mut running = true;
+    gameLoop(&mut renderer, &mut window, &mut textureVec, save.0, save.1, save.2, save.3, &mut running);
 }
 
-fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &mut Vec<Texture>, mainCharacter: mainCharacter, environmentFile: String, startX: f32, startY: f32) {
+fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &mut Vec<Texture>, mainCharacter: mainCharacter, environmentFile: String, startX: f32, startY: f32, running: &mut bool) {
     let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*environmentFile+ ".json"))));
 
     for location in environment.0 {
@@ -59,15 +60,15 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
     meshBox.y = startY;
 
     let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2);
-
-    let mut running = true;
-
-    while running && pixelEngine.alive {
+    
+    while *running && pixelEngine.alive {
         let now = Instant::now();
 
-        pixelEngine.input(window, &textureVec, &mut running);
-        pixelEngine.update(&mut textureVec, renderer, window);
+        pixelEngine.update(&mut textureVec, renderer, window, running);
         pixelEngine.render(&textureVec, renderer, &window);
+        pixelEngine.input(window, &textureVec, running);
+        println!("{}", running);
+
 
         let mut elapsed = now.elapsed().as_millis();
         if elapsed > 16 {
@@ -76,7 +77,6 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
         let extraTime = 16 - elapsed;
         delay(extraTime as u32);
     }
-    delay(250);
 
     let path = Path::new("src/Assets/DovesTypeText-Regular.ttf"); //here
     let ttfContext = sdl3::ttf::init().map_err(|e| e.to_string()).unwrap();
@@ -85,7 +85,11 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
     let gameOverSurface = font.render("You Died").blended(Color::RGB(150, 50, 50)).unwrap();
     let gameOverTexture = renderer.create_texture_from_surface(&gameOverSurface).unwrap();
 
-    while running {
+    if *running {
+        delay(250);
+    }
+
+    while *running {
         renderer.set_draw_color(Color::RGB(0, 0, 0));
         renderer.clear();
 
@@ -100,7 +104,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
         renderer.copy(&gameOverTexture, None, deathMsgRect).unwrap();
 
         renderer.present();
-        gameOverInput(&mut running);
+        gameOverInput(running);
     }
 }
 

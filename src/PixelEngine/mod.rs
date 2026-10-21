@@ -16,7 +16,7 @@ use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter};
 
 pub struct pixelEngine {
     meshBox: meshBox,
-    mainCharacter: mainCharacter,
+    pub(crate) mainCharacter: mainCharacter,
     enemies: Vec<enemy>,
     pub(crate) alive: bool,
 }
@@ -202,7 +202,7 @@ impl pixelEngine {
             }
         }
     }
-    pub fn update(&mut self, mut textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window) {
+    pub fn update(&mut self, mut textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool) {
         self.mainCharacter.update();
         for mut enemy in self.enemies.iter_mut() {
             let enemyUsedHitbox = FRect::new(
@@ -258,13 +258,16 @@ impl pixelEngine {
         for enemyPos in 0..self.enemies.len() {
             if self.enemies[enemyPos].roam {
                 enemiesClone[enemyPos].roamPattern.roam(&mut self.mainCharacter, &mut self.meshBox, &mut self.enemies[enemyPos], &textureVec[texturePos]);
+                self.enemies[enemyPos].roamPattern = enemiesClone[enemyPos].roamPattern.clone();
             }
             else {
                 enemiesClone[enemyPos].attacks.attack(&mut self.mainCharacter, &mut self.meshBox, &mut self.enemies[enemyPos], &textureVec[texturePos]);
+                self.enemies[enemyPos].attacks = enemiesClone[enemyPos].attacks.clone();
             }
         }
+
         for mut trigger in self.meshBox.triggers.iter_mut() {
-            trigger.trigger(&mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, self.meshBox.x, self.meshBox.y);
+            trigger.trigger(&mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, self.meshBox.x, self.meshBox.y, running);
         }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {
