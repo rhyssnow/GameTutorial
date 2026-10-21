@@ -67,8 +67,6 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
         pixelEngine.update(&mut textureVec, renderer, window, running);
         pixelEngine.render(&textureVec, renderer, &window);
         pixelEngine.input(window, &textureVec, running);
-        println!("{}", running);
-
 
         let mut elapsed = now.elapsed().as_millis();
         if elapsed > 16 {

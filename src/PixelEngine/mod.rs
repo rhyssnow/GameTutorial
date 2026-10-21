@@ -288,14 +288,25 @@ impl pixelEngine {
         let crestRenderArea = FRect::new(0.0, 0.0, 104.0, 115.0);
 
         self.meshBox.render(textureVec, renderer, backgroundRenderArea);
+
+        let mut renderThings = Vec::new();
         if self.mainCharacter.render {
-            self.mainCharacter.render(textureVec, renderer);
+            renderThings.push((0, self.mainCharacter.y / 6.0 + self.meshBox.y, 0));
         }
-        for enemy in self.enemies.iter_mut() {
-            if enemy.render {
-                enemy.render(textureVec, renderer, &mut self.meshBox);
+        for enemy in 0.. self.enemies.len() {
+            if self.enemies[enemy].render {
+                renderThings.push((enemy, self.enemies[enemy].y, 1));
             }
         }
+        renderThings.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+        for thing in renderThings {
+            match thing.2 {
+                0 => self.mainCharacter.render(textureVec,renderer),
+                1 => self.enemies[thing.0].render(textureVec, renderer, &mut self.meshBox),
+                _ => {}
+            }
+        }
+
         self.mainCharacter.swordAttack.render(renderer, self.mainCharacter.x, self.mainCharacter.y, textureVec);
         self.mainCharacter.stats.render(renderer);
 
