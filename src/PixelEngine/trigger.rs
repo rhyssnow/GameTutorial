@@ -1,3 +1,4 @@
+use std::time::Instant;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::video::Window;
 use crate::gameLoop;
@@ -53,9 +54,46 @@ impl trigger {
         }
 
         match self.triggerType.as_str() {
+            "impassable" => impassable(mainCharacter, hitbox, window),
             _ => {}
         }
     }
+}
+
+fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, window: &Window) {
+
+    if hitboxDetector(hitBox, mainCharacter.hitBox) {
+        let speed = 6.0;
+
+        let hitboxX = hitBox.x + hitBox.w /2.0;
+        let hitboxY = hitBox.y + hitBox.h /2.0;
+
+        let dx = mainCharacter.x - hitboxX;
+        let dy = mainCharacter.y - hitboxY;
+
+        let mut dxRatio = dx / dy;
+        if dxRatio < 0.0{
+            dxRatio = -dxRatio;
+        }
+        dxRatio += 1.0;
+
+        let mut my = speed / dxRatio;
+        let mut mx = speed - my;
+        if my > speed {
+            mx = speed / dxRatio;
+            my = speed - my;
+        }
+
+        if dx < 0.0 {
+            mx = -mx;
+        }
+        if dy < 0.0 {
+            my = -my;
+        }
+
+        mainCharacter.updatePosition(mx, my, window);
+    }
+    // add this for enemies. also knockback for when the main character gets hit
 }
 
 fn loadNewArea (file: String, area: &FRect, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool) {
@@ -63,7 +101,6 @@ fn loadNewArea (file: String, area: &FRect, renderer: &mut WindowCanvas, window:
         while textureVec.len() > 3 {
             textureVec.pop().unwrap();
         }
-        //update values instead of re-calling gameloop.as
 
         gameLoop(renderer, window, textureVec, mainCharacter.clone(), file, 0.0, 0.0, running);
     }
