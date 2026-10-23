@@ -215,6 +215,14 @@ impl pixelEngine {
                 self.mainCharacter.timeSinceHit = Instant::now();
                 self.mainCharacter.stats.health -= 2.0;
                 self.mainCharacter.immune = true;
+                let speed = 30.0;
+
+                let dx = self.mainCharacter.x - enemyUsedHitbox.x;
+                let dy = self.mainCharacter.y - enemyUsedHitbox.y;
+
+                let m = movementCalculator(dx, dy, speed);
+
+                self.mainCharacter.updatePosition(m.0, m.1, window);
                 if self.mainCharacter.stats.health <= 0.0 {
                     self.alive = false;
                 }
@@ -227,28 +235,10 @@ impl pixelEngine {
                 let dx = mainPosX - enemy.x * 6.0;
                 let dy = mainPosY - enemy.y * 6.0;
 
-                let mut dxRatio = dx / dy;
-                if dxRatio < 0.0{
-                    dxRatio = -dxRatio;
-                }
-                dxRatio += 1.0;
-
-                let mut my = speed / dxRatio;
-                let mut mx = speed - my;
-                if my > speed {
-                    mx = speed / dxRatio;
-                    my = speed - my;
-                }
-
-                if dx < 0.0 {
-                    mx = -mx;
-                }
-                if dy < 0.0 {
-                    my = -my;
-                }
+                let m = movementCalculator(dx, dy, speed);
 
                 enemy.health -= 0.1;
-                enemy.updatePosition(-mx, -my, &textureVec[self.meshBox.texturePos]);
+                enemy.updatePosition(-m.0, -m.1, &textureVec[self.meshBox.texturePos]);
                 enemy.timeSinceHit = Instant::now();
             }
             enemy.update();
@@ -343,4 +333,27 @@ fn hitboxDetector(hitbox1: FRect, hitbox2: FRect) -> bool {
     }
 
     touching
+}
+
+fn movementCalculator(dx: f32, dy: f32, speed: f32) -> (f32, f32) {
+    let mut dxRatio = dx / dy;
+    if dxRatio < 0.0{
+        dxRatio = -dxRatio;
+    }
+    dxRatio += 1.0;
+
+    let mut my = speed / dxRatio;
+    let mut mx = speed - my;
+    if my > speed {
+        mx = speed / dxRatio;
+        my = speed - my;
+    }
+
+    if dx < 0.0 {
+        mx = -mx;
+    }
+    if dy < 0.0 {
+        my = -my;
+    }
+    (mx, my)
 }

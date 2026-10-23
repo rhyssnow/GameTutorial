@@ -2,8 +2,8 @@ use std::time::Instant;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::video::Window;
 use crate::gameLoop;
-use crate::PixelEngine::basic::{enemy, mainCharacter, meshBox};
-use crate::PixelEngine::hitboxDetector;
+use crate::PixelEngine::basic::{enemy, mainCharacter};
+use crate::PixelEngine::{hitboxDetector, movementCalculator};
 
 #[derive(Clone)]
 pub struct trigger {
@@ -13,7 +13,7 @@ pub struct trigger {
 
 impl trigger {
     pub fn new(triggerType: String, mut area: FRect) -> trigger { trigger{triggerType, area}}
-    pub fn trigger(&mut self, mainCharacter: &mut mainCharacter, mut enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, meshBoxX: f32, meshBoxY: f32, running: &mut bool) {
+    pub fn trigger(&mut self, mainCharacter: &mut mainCharacter, enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, meshBoxX: f32, meshBoxY: f32, running: &mut bool) {
         let mut newArea = false;
         let mut file = String::new();
         let mut index = 0;
@@ -54,13 +54,13 @@ impl trigger {
         }
 
         match self.triggerType.as_str() {
-            "impassable" => impassable(mainCharacter, hitbox, window),
+            "impassable" => impassable(mainCharacter, hitbox, window, enemies, textureVec),
             _ => {}
         }
     }
 }
 
-fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, window: &Window) {
+fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, window: &Window, enemies: &mut Vec<enemy>, textureVec: &Vec<Texture>) {
 
     if hitboxDetector(hitBox, mainCharacter.hitBox) {
         let speed = 6.0;
@@ -71,29 +71,23 @@ fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, window: &Window
         let dx = mainCharacter.x - hitboxX;
         let dy = mainCharacter.y - hitboxY;
 
-        let mut dxRatio = dx / dy;
-        if dxRatio < 0.0{
-            dxRatio = -dxRatio;
-        }
-        dxRatio += 1.0;
+        let m = movementCalculator(dx, dy, speed);
 
-        let mut my = speed / dxRatio;
-        let mut mx = speed - my;
-        if my > speed {
-            mx = speed / dxRatio;
-            my = speed - my;
-        }
-
-        if dx < 0.0 {
-            mx = -mx;
-        }
-        if dy < 0.0 {
-            my = -my;
-        }
-
-        mainCharacter.updatePosition(mx, my, window);
+        mainCharacter.updatePosition(m.0, m.1, window);
     }
     // add this for enemies. also knockback for when the main character gets hit
+    for enemy in enemies.iter_mut() {
+        if hitboxDetector(enemy.hitBox, hitBox){
+            let speed = 1.0;
+
+            let dx = hitBox.x - enemy.x * 6.0;
+            let dy = hitBox.y - enemy.y * 6.0;
+
+            let m = movementCalculator(dx, dy, speed);
+
+            enemy.updatePosition(-m.0, -m.1, &textureVec[3]);
+        }
+    }
 }
 
 fn loadNewArea (file: String, area: &FRect, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool) {
