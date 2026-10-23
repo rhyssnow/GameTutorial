@@ -308,6 +308,7 @@ impl pixelEngine {
         }
 
         self.mainCharacter.swordAttack.render(renderer, self.mainCharacter.x, self.mainCharacter.y, textureVec);
+        self.meshBox.renderForeground(textureVec, renderer, backgroundRenderArea);
         self.mainCharacter.stats.render(renderer);
 
         renderer.copy(&textureVec[1], None, crestRenderArea).unwrap();

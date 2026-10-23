@@ -22,7 +22,7 @@ pub struct meshBox {
 }
 
 impl meshBox {
-    pub fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec<trigger>) -> meshBox {meshBox{x, y, width, height, endOfDirection: Vec::new(), triggers, texturePos: 3}}
+    pub fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec<trigger>) -> meshBox {meshBox{x, y, width, height, endOfDirection: Vec::new(), triggers, texturePos: 4}}
 
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, renderArea: FRect) {
         let textureArea = FRect::new(self.x, self.y, renderArea.w / 6.0, renderArea.h / 6.0 );
@@ -31,6 +31,14 @@ impl meshBox {
         self.height = renderArea.h /6.0;
 
         renderer.copy(&textureVec[self.texturePos], textureArea, renderArea).unwrap();
+    }
+    pub fn renderForeground(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, renderArea: FRect) {
+        let textureArea = FRect::new(self.x, self.y, renderArea.w / 6.0, renderArea.h / 6.0 );
+
+        self.width = renderArea.w /6.0;
+        self.height = renderArea.h /6.0;
+
+        renderer.copy(&textureVec[self.texturePos - 1], textureArea, renderArea).unwrap();
     }
     pub fn updatePosition(&mut self, mx: f32, my: f32, texture: &Texture) {
         self.x += mx;

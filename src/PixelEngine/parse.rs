@@ -28,6 +28,7 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
     let mut triggerVec = Vec::new();
 
     for meshBox in data["meshBox"].as_array().unwrap() {
+        textureVec.push(meshBox["foreground"].as_str().unwrap().to_string());
         textureVec.push(meshBox["background"].as_str().unwrap().to_string());
         for trigger in meshBox["triggers"].as_array().unwrap() {
             let triggerArea = FRect::new(
@@ -43,8 +44,8 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
 
     let content = fs::read_to_string(Path::new("src/Metadata/enemies.json")).unwrap();
     let enemyData: Value = serde_json::from_str(&content).unwrap();
-    
-    let mut texturePos = 4;
+
+    let mut texturePos = 5;
     for enemy in data["enemies"].as_array().unwrap() {
         for enemyType in enemyData[enemy["enemyType"].as_str().unwrap().to_string()].as_array().unwrap() {
             let mut up = Vec::new();
