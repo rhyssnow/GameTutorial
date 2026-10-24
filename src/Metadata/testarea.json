@@ -157,7 +157,7 @@
   "enemies" : [
     {"enemyType" : "wolfPace", "x" : 580, "y" : 223, "roamX": 475, "roamY": 223, "roamW": 130, "roamH": 0},
     {"enemyType" : "wolfPace", "x" : 850, "y" : 226, "roamX": 750, "roamY": 226, "roamW": 130, "roamH": 0},
-    {"enemyType" : "wolfMissile", "x" : 850, "y" : 600, "roamX": 771, "roamY": 545, "roamW": 150, "roamH": 95},
+    {"enemyType" : "wolfMissile", "x" : 850, "y" : 600, "roamX": 771, "roamY": 545, "roamW": 150, "roamH": 80},
     {"enemyType" : "wolfMissile", "x" : 660, "y" : 755, "roamX": 635, "roamY": 735, "roamW": 75, "roamH": 30}
   ]
 }

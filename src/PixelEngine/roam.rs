@@ -107,6 +107,6 @@ fn squareRoam (enemy: &mut enemy, roamArea: &FRect, mut movePoint: &mut i32, bac
         (roamArea.h + 50.0) * 6.0,
     );
     if hitboxDetector(hitbox, mainCharacter.hitBox) {
-        //enemy.roam = false;
+        enemy.roam = false;
     }
 }
