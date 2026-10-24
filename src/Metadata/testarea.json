@@ -2,7 +2,7 @@
   "meshBox" : [
     {"background" : "src/Assets/tutorialOne.png", "foreground" : "src/Assets/tutorialOneForeground.png", "triggers" : [
       {"triggerType":  "newAreatestarea", "x": 206, "y": 1000, "w": 82, "h": 0},
-      {"triggerType": "impassable", "x": 439, "y": 189, "w": 92, "h": 43}
+      {"triggerType": "impassable", "x": 214, "y": 160, "w": 49, "h": 27}
     ]}
   ],
   "enemies" : [

@@ -1,4 +1,5 @@
 use std::time::Instant;
+use sdl3::pixels::Color;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::video::Window;
 use crate::gameLoop;
@@ -62,18 +63,34 @@ impl trigger {
 
 fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, window: &Window, enemies: &mut Vec<enemy>, textureVec: &Vec<Texture>) {
 
-    if hitboxDetector(hitBox, mainCharacter.hitBox) {
-        let speed = 6.0;
+    if hitboxDetector(hitBox, mainCharacter.hitBox) { 
+        let topMain = mainCharacter.hitBox.y;
+        let bottomMain = mainCharacter.hitBox.y + mainCharacter.hitBox.h;
+        let leftMain = mainCharacter.hitBox.x;
+        let rightMain = mainCharacter.hitBox.x + mainCharacter.hitBox.w;
 
-        let hitboxX = hitBox.x + hitBox.w /2.0;
-        let hitboxY = hitBox.y + hitBox.h /2.0;
+        let top = hitBox.y;
+        let bottom = hitBox.y + hitBox.h;
+        let left = hitBox.x;
+        let right = hitBox.x + hitBox.w;
 
-        let dx = mainCharacter.x - hitboxX;
-        let dy = mainCharacter.y - hitboxY;
+        if leftMain > left - (mainCharacter.hitBox.w - 7.0) && rightMain < right + (mainCharacter.hitBox.w - 7.0)  {
+            if bottomMain > top && bottomMain < bottom {
+                mainCharacter.y = hitBox.y - mainCharacter.hitBox.h;
+            }
+            if topMain < bottom && topMain > top {
+                mainCharacter.y = hitBox.y + hitBox.h;
 
-        let m = movementCalculator(dx, dy, speed);
-
-        mainCharacter.updatePosition(m.0, m.1, window);
+            }
+        }
+        else if topMain > top - (mainCharacter.hitBox.h - 7.0) && bottomMain < bottom + (mainCharacter.hitBox.h - 7.0) {
+            if leftMain > left && leftMain < right {
+                mainCharacter.x = hitBox.x + hitBox.w;
+            }
+            if rightMain < right && rightMain > left {
+                mainCharacter.x = hitBox.x - mainCharacter.hitBox.w;
+            }
+        }
     }
     // add this for enemies. also knockback for when the main character gets hit
     for enemy in enemies.iter_mut() {

@@ -215,7 +215,7 @@ impl pixelEngine {
                 self.mainCharacter.timeSinceHit = Instant::now();
                 self.mainCharacter.stats.health -= 2.0;
                 self.mainCharacter.immune = true;
-                let speed = 30.0;
+                let speed = 20.0;
 
                 let dx = self.mainCharacter.x - enemyUsedHitbox.x;
                 let dy = self.mainCharacter.y - enemyUsedHitbox.y;
