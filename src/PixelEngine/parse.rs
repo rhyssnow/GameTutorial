@@ -4,7 +4,7 @@ use serde_json::Value;
 use sdl3::render::FRect;
 use sdl3::video::Window;
 use crate::PixelEngine::attack::attacks;
-use crate::PixelEngine::basic::{enemy, mainCharacter, meshBox};
+use crate::PixelEngine::basic::{enemy, hazard, mainCharacter, meshBox};
 use crate::PixelEngine::roam::roamPattern;
 use crate::PixelEngine::trigger::trigger;
 
@@ -18,7 +18,7 @@ pub fn loadSaveFromJson (window: &Window) -> (mainCharacter, String, f32, f32) {
     (mainCharacter, path.to_string(), data["x"].as_f64().unwrap() as f32, data["y"].as_f64().unwrap() as f32)
 }
 
-pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy>) {
+pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy>, Vec<trigger>, Vec<hazard>) {
     let mut meshBox: meshBox;
     let mut textureVec = Vec::new();
     let mut enemies = Vec::new();
@@ -26,6 +26,7 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
     let content = fs::read_to_string(&file).unwrap();
     let data: Value = serde_json::from_str(&content).unwrap();
     let mut triggerVec = Vec::new();
+    let mut hazardVec = Vec::new();
 
     for meshBox in data["meshBox"].as_array().unwrap() {
         textureVec.push(meshBox["foreground"].as_str().unwrap().to_string());
@@ -39,8 +40,17 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
             );
             triggerVec.push(trigger::new(trigger["triggerType"].as_str().unwrap().to_string(), triggerArea));
         }
+        for hazard in meshBox["hazards"].as_array().unwrap() {
+            let hazardArea = FRect::new(
+                hazard["x"].as_f64().unwrap() as f32,
+                hazard["y"].as_f64().unwrap() as f32,
+                hazard["w"].as_f64().unwrap() as f32,
+                hazard["h"].as_f64().unwrap() as f32,
+            );
+            hazardVec.push(hazard::new(hazard["damage"].as_f64().unwrap() as f32, hazardArea));
+        }
     }
-    meshBox = meshBox::new(0.0, 0.0, 0.0, 0.0, triggerVec);
+    meshBox = meshBox::new(0.0, 0.0, 0.0, 0.0);
 
     let content = fs::read_to_string(Path::new("src/Metadata/enemies.json")).unwrap();
     let enemyData: Value = serde_json::from_str(&content).unwrap();
@@ -106,5 +116,5 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
         }
         texturePos += 1;
     }
-    (textureVec, meshBox, enemies) //the meshbox needs its width, height and x, y coordinates set before it is usable.
+    (textureVec, meshBox, enemies, triggerVec, hazardVec) //the meshbox needs its width, height and x, y coordinates set before it is usable.
 }

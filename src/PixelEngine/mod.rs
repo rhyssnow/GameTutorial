@@ -12,17 +12,19 @@ use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::keyboard::Scancode;
 use sdl3::pixels::Color;
 use sdl3::video::Window;
-use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter};
+use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter, hazard};
 
 pub struct pixelEngine {
     meshBox: meshBox,
     pub(crate) mainCharacter: mainCharacter,
     enemies: Vec<enemy>,
+    pub(crate) triggers: Vec<trigger::trigger>,
+    hazards: Vec<hazard>,
     pub(crate) alive: bool,
 }
 
 impl pixelEngine {
-    pub fn new(meshBox: meshBox, mainCharacter: mainCharacter, enemies: Vec<enemy>) -> pixelEngine {pixelEngine{ meshBox, mainCharacter, enemies, alive: true}}
+    pub fn new(meshBox: meshBox, mainCharacter: mainCharacter, enemies: Vec<enemy>, triggers: Vec<trigger::trigger>, hazards: Vec<hazard>) -> pixelEngine {pixelEngine{ meshBox, mainCharacter, enemies, alive: true, triggers, hazards}}
 
     pub fn input (&mut self, window: &Window, textureVec: &Vec<Texture>, running: &mut bool) {
         let mut eventPump = sdl3::init().unwrap().event_pump().unwrap();
@@ -256,8 +258,11 @@ impl pixelEngine {
             }
         }
 
-        for mut trigger in self.meshBox.triggers.iter_mut() {
-            trigger.trigger(&mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, self.meshBox.x, self.meshBox.y, running);
+        for trigger in self.triggers.iter_mut() {
+            trigger.trigger(&mut self.meshBox, &mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, running);
+        }
+        for hazard in self.hazards.iter_mut() {
+            hazard.update(&mut self.mainCharacter, &mut self.meshBox, &mut self.alive, window)
         }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {
@@ -305,6 +310,7 @@ impl pixelEngine {
 
         renderer.present();
     }
+
 }
 fn hitboxDetector(hitbox1: FRect, hitbox2: FRect) -> bool {
     let mut touching = true;

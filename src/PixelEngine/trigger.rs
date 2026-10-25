@@ -1,9 +1,8 @@
-use std::time::Instant;
 use sdl3::pixels::Color;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::video::Window;
 use crate::gameLoop;
-use crate::PixelEngine::basic::{enemy, mainCharacter};
+use crate::PixelEngine::basic::{enemy, mainCharacter, meshBox};
 use crate::PixelEngine::{hitboxDetector, movementCalculator};
 
 #[derive(Clone)]
@@ -14,7 +13,7 @@ pub struct trigger {
 
 impl trigger {
     pub fn new(triggerType: String, mut area: FRect) -> trigger { trigger{triggerType, area}}
-    pub fn trigger(&mut self, mainCharacter: &mut mainCharacter, enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, meshBoxX: f32, meshBoxY: f32, running: &mut bool) {
+    pub fn trigger(&mut self, meshBox: &mut meshBox, mainCharacter: &mut mainCharacter, enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool) {
         let mut newArea = false;
         let mut file = String::new();
         let mut index = 0;
@@ -44,8 +43,8 @@ impl trigger {
         }
 
         let hitbox = FRect::new(
-            (self.area.x - meshBoxX) * 6.0,
-            (self.area.y - meshBoxY) * 6.0,
+            (self.area.x - meshBox.x) * 6.0,
+            (self.area.y - meshBox.y) * 6.0,
             self.area.w *6.0,
             self.area.h*6.0
         );
@@ -56,6 +55,7 @@ impl trigger {
 
         match self.triggerType.as_str() {
             "impassable" => impassable(mainCharacter, hitbox, window, enemies, textureVec),
+            "setNewRespawn" => setNewRespawn(hitbox, mainCharacter, meshBox),
             _ => {}
         }
     }
@@ -104,6 +104,19 @@ fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, window: &Window
 
             enemy.updatePosition(-m.0, -m.1, &textureVec[3]);
         }
+    }
+}
+
+fn setNewRespawn (area: FRect, mainCharacter: &mut mainCharacter, meshBox: &mut meshBox) {
+    let mainHitbox = FRect::new(
+        mainCharacter.x + 3.5,
+        mainCharacter.y + 77.0,
+        mainCharacter.hitBox.w - 7.0,
+        mainCharacter.hitBox.h - 77.0,
+    );
+    if hitboxDetector(area, mainHitbox) {
+        meshBox.respawnCoords = (meshBox.x, meshBox.y);
+        mainCharacter.respawnCoords = (mainCharacter.x, mainCharacter.y);
     }
 }
 

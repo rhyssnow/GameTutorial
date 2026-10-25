@@ -8,8 +8,8 @@ use std::time::Instant;
 use sdl3::pixels::Color;
 use sdl3::video::Window;
 use crate::PixelEngine::attack::attacks;
+use crate::PixelEngine::hitboxDetector;
 use crate::PixelEngine::roam::roamPattern;
-use crate::PixelEngine::trigger::trigger;
 
 pub struct meshBox {
     pub x: f32,
@@ -17,12 +17,12 @@ pub struct meshBox {
     width: f32,
     height: f32,
     pub endOfDirection: Vec<String>,
-    pub(crate) triggers: Vec<trigger>,
-    pub texturePos: usize
+    pub texturePos: usize,
+    pub respawnCoords: (f32, f32),
 }
 
 impl meshBox {
-    pub fn new(x: f32, y: f32, width: f32, height: f32, triggers: Vec<trigger>) -> meshBox {meshBox{x, y, width, height, endOfDirection: Vec::new(), triggers, texturePos: 4}}
+    pub fn new(x: f32, y: f32, width: f32, height: f32) -> meshBox {meshBox{x, y, width, height, endOfDirection: Vec::new(), texturePos: 4, respawnCoords: (x, y)}}
 
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, renderArea: FRect) {
         let textureArea = FRect::new(self.x, self.y, renderArea.w / 6.0, renderArea.h / 6.0 );
@@ -67,6 +67,37 @@ impl meshBox {
     }
 }
 
+pub struct hazard {
+    pub damage: f32,
+    pub area: FRect,
+}
+
+impl hazard {
+    pub fn new(damage: f32, area: FRect) -> hazard {hazard{damage, area}}
+    pub fn update(&mut self, mainCharacter: &mut mainCharacter, meshBox: &mut meshBox, alive: &mut bool, window: &Window) {
+        let hitbox = FRect::new((self.area.x - meshBox.x) * 6.0, (self.area.y - meshBox.y) * 6.0, self.area.w * 6.0 , self.area.h * 6.0);
+        let mainHitbox = FRect::new(
+            mainCharacter.x + 3.5,
+            mainCharacter.y + 110.0,
+            mainCharacter.hitBox.w - 7.0,
+            mainCharacter.hitBox.h - 110.0,
+        );
+
+        if hitboxDetector(hitbox, mainHitbox) && !mainCharacter.immune {
+            mainCharacter.timeSinceHit = Instant::now();
+            mainCharacter.stats.health -= 2.0;
+            mainCharacter.immune = true;
+            if mainCharacter.stats.health < 0.0 {
+                *alive = false;
+            }
+            meshBox.x = meshBox.respawnCoords.0;
+            meshBox.y = meshBox.respawnCoords.1;
+            mainCharacter.x = mainCharacter.respawnCoords.0;
+            mainCharacter.y = mainCharacter.respawnCoords.1;
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct mainCharacter{
     pub x: f32,
@@ -89,6 +120,7 @@ pub struct mainCharacter{
     pub jumping: bool,
     height: f32,
     pub velocity: f32,
+    pub respawnCoords: (f32, f32),
 }
 impl mainCharacter {
     pub fn new(x: f32, y: f32, health: f32) -> mainCharacter {mainCharacter{
@@ -112,6 +144,7 @@ impl mainCharacter {
         jumping: false,
         height: 0.0,
         velocity: 0.0,
+        respawnCoords: (x, y),
     }}
     pub fn walkPhaseChange(&mut self) {
         if self.lastPhaseChange.elapsed().as_millis() >= 200 {

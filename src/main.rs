@@ -58,8 +58,9 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
     let mut meshBox = environment.1;
     meshBox.x = startX;
     meshBox.y = startY;
+    meshBox.respawnCoords = (startX, startY);
 
-    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2);
+    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.3, environment.4);
     
     while *running && pixelEngine.alive {
         let now = Instant::now();
