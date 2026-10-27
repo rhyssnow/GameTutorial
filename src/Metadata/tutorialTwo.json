@@ -1,0 +1,16 @@
+{
+  "meshBox" : [
+    {"background" : "src/Assets/tutorialTwo.png", "foreground" : "src/Assets/tutorialTwoForeground.png", "triggers" : [
+      {"triggerType":  "newAreatutorialOne", "x": 206, "y": 0, "w": 82, "h": 0}
+
+    ], "hazards" : [
+
+    ]}
+  ],
+  "enemies" : [
+    {"enemyType" : "wolfMissile", "x" : 200, "y" : 135, "roamX": 200, "roamY": 140, "roamW": 105, "roamH": 48},
+    {"enemyType" : "wolfMissile", "x" : 160, "y" : 170, "roamX": 160, "roamY": 170, "roamW": 164, "roamH": 114},
+    {"enemyType" : "wolfMissile", "x" : 320, "y" : 350, "roamX": 160, "roamY": 170, "roamW": 164, "roamH": 114},
+    {"enemyType" : "wolfMissile", "x" : 435, "y" : 607, "roamX": 607, "roamY": 435, "roamW": 76, "roamH": 158}
+  ]
+}
