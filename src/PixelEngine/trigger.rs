@@ -1,3 +1,4 @@
+use std::time::Instant;
 use sdl3::pixels::Color;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::video::Window;
@@ -50,7 +51,7 @@ impl trigger {
         );
 
         if newArea {
-            loadNewArea(file, &hitbox, renderer, window, mainCharacter, textureVec, running);
+            loadNewArea(file, hitbox, meshBox, renderer, window, mainCharacter, textureVec, running);
         }
 
         match self.triggerType.as_str() {
@@ -120,12 +121,47 @@ fn setNewRespawn (area: FRect, mainCharacter: &mut mainCharacter, meshBox: &mut 
     }
 }
 
-fn loadNewArea (file: String, area: &FRect, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool) {
-    if hitboxDetector(mainCharacter.hitBox, *area) {
+fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mut mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool) {
+    if hitboxDetector(mainCharacter.hitBox, area) {
+        let calctime = Instant::now();
+        let startX: f32;
+        if area.x > textureVec[3].width() as f32 - 10.0 {
+            startX = 0.0;
+            mainCharacter.x = -40.0;
+        } else if area.x < 10.0 {
+            startX = -1.0;
+            mainCharacter.x = window.size_in_pixels().0 as f32 - mainCharacter.hitBox.w + 40.0;
+        } else {
+            startX = meshBox.x;
+        }
+
+        let startY: f32;
+        if area.y > textureVec[3].height() as f32 - 10.0 {
+            startY = 0.0;
+            mainCharacter.y = -40.0;
+        } else if area.y < 10.0 {
+            startY = -1.0;
+            mainCharacter.y = window.size_in_pixels().1 as f32 - mainCharacter.hitBox.h + 40.0;
+        } else {
+            startY = meshBox.y;
+        }
+
+        println!("calctime {:?}", calctime.elapsed());
+
+        let vectime = Instant::now();
+
         while textureVec.len() > 3 {
             textureVec.pop().unwrap();
         }
 
-        gameLoop(renderer, window, textureVec, mainCharacter.clone(), file, 0.0, 0.0, running);
+        println!("vectime {:?}", vectime.elapsed());
+
+        let clonetime = Instant::now();
+
+        let mainCharacterClone = mainCharacter.clone();
+
+        println!("clonetime {:?}", clonetime.elapsed());
+
+        gameLoop(renderer, window, textureVec, mainCharacterClone, file, startX, startY, running);
     }
 }

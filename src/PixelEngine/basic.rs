@@ -239,16 +239,16 @@ impl mainCharacter {
         self.x += x;
         self.y += y;
 
-        if self.x < 0.0 {
+        if self.x < 0.0 - self.hitBox.w / 2.0 {
             self.x = 0.0;
         }
-        if self.y < 0.0 {
+        if self.y < 0.0 - self.hitBox.h / 2.0 {
             self.y = 0.0;
         }
-        if self.x + 70.0 > 0.0 + window.size_in_pixels().0 as f32 {
+        if self.x + 70.0 > window.size_in_pixels().0 as f32 + self.hitBox.w / 2.0 {
             self.x = window.size_in_pixels().0 as f32 - 70.0;
         }
-        if self.y + 105.0 > 0.0 + window.size_in_pixels().1 as f32 {
+        if self.y + 105.0 > 0.0 + window.size_in_pixels().1 as f32 + self.hitBox.h / 2.0 {
             self.y = window.size_in_pixels().1 as f32 - 105.0;
         }
     }

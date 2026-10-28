@@ -10,6 +10,7 @@ use sdl3::render::{create_renderer, WindowCanvas, FRect, Texture};
 use sdl3::surface::Surface;
 use sdl3::timer::delay;
 use sdl3::video::Window;
+use std::thread;
 use crate::PixelEngine::basic::mainCharacter;
 use crate::PixelEngine::pixelEngine;
 use crate::PixelEngine::parse::{createEnvironmentFromJson, loadSaveFromJson};
@@ -48,8 +49,22 @@ fn main() {
 fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &mut Vec<Texture>, mainCharacter: mainCharacter, environmentFile: String, startX: f32, startY: f32, running: &mut bool) {
     let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*environmentFile+ ".json"))));
 
+    let mut threads = Vec::new();
+
     for location in environment.0 {
-        let surface = Surface::load_png(location).unwrap();
+        let thread = thread::spawn(move || {
+            let start_time = Instant::now();
+
+            let surface = Surface::load_png(location).unwrap();
+            println!("starttime {:?}", start_time.elapsed());
+
+            return surface;
+        });
+        threads.push(thread);
+    }
+
+    for thread in threads {
+        let surface  =thread.join().unwrap();
         let mut texture = renderer.create_texture_from_surface(&surface).unwrap();
         texture.set_scale_mode(sdl3::render::ScaleMode::Nearest);
         textureVec.push(texture);
@@ -57,11 +72,17 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
 
     let mut meshBox = environment.1;
     meshBox.x = startX;
+    if meshBox.x == -1.0{
+        meshBox.x = (textureVec[3].width() - window.size_in_pixels().0 / 6) as f32
+    }
     meshBox.y = startY;
+    if meshBox.y == -1.0{
+        meshBox.y = (textureVec[3].height() - window.size_in_pixels().1 / 6) as f32
+    }
     meshBox.respawnCoords = (startX, startY);
 
     let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.3, environment.4);
-    
+
     while *running && pixelEngine.alive {
         let now = Instant::now();
 

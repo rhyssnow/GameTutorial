@@ -1,7 +1,7 @@
 {
   "meshBox" : [
     {"background" : "src/Assets/tutorialTwo.png", "foreground" : "src/Assets/tutorialTwoForeground.png", "triggers" : [
-      {"triggerType":  "newAreatutorialOne", "x": 206, "y": 0, "w": 82, "h": 0},
+      {"triggerType":  "newAreatutorialOne", "x": 206, "y": -7, "w": 82, "h": 0},
       {"triggerType":  "impassable", "x": 201, "y": 1, "w": 13, "h": 9},
       {"triggerType":  "impassable", "x": 203, "y": 10, "w": 9, "h": 14},
       {"triggerType":  "impassable", "x": 204, "y": 18, "w": 9, "h": 12},
