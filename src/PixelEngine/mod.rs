@@ -146,7 +146,7 @@ impl pixelEngine {
         }
 
         for object in self.objects.iter_mut() {
-            object.updateInput(&self.mainCharacter, window, &keyboardState, &self.meshBox);
+            object.updateInput(&self.mainCharacter, window, &keyboardState, &self.meshBox, &self.currentArea);
         }
 
         let directions = [moveBackInDirection.clone(), moveMainInDirection.clone()].concat();

@@ -122,7 +122,7 @@ impl object{
             _ => {}
         }
     }
-    pub fn updateInput(&mut self, mainCharacter: &mainCharacter, window: &Window, keyboardState: &KeyboardState, meshBox: &meshBox){
+    pub fn updateInput(&mut self, mainCharacter: &mainCharacter, window: &Window, keyboardState: &KeyboardState, meshBox: &meshBox, currentLocation: &String){
         if self.timeSinceStateChange.elapsed().as_millis() > 500 {
             self.timeSinceStateChange = Instant::now();
             self.animationState += 1;
@@ -132,18 +132,19 @@ impl object{
             println!("{}", self.animationState);
         }
         match self.objectType.as_str(){
-            "litBeacon" => litBeaconInput(self.areaOfEffect, mainCharacter, window, keyboardState, meshBox),
+            "litBeacon" => litBeaconInput(self.areaOfEffect, mainCharacter, window, keyboardState, meshBox, currentLocation),
             _ => {}
         }
     }
 }
 
-fn litBeaconInput (areaOfEffect: FRect, mainCharacter: &mainCharacter, window: &Window, keyboardState: &KeyboardState, meshBox: &meshBox) {
+fn litBeaconInput (areaOfEffect: FRect, mainCharacter: &mainCharacter, window: &Window, keyboardState: &KeyboardState, meshBox: &meshBox, currentLocation: &String) {
     let hitbox = FRect::new((areaOfEffect.x - meshBox.x) * 6.0, (areaOfEffect.y - meshBox.y) * 6.0, areaOfEffect.w * 6.0, areaOfEffect.h * 6.0);
     if hitboxDetector(areaOfEffect, hitbox) && keyboardState.is_scancode_pressed(Scancode::F) {
         let content = fs::read_to_string(&"src/Metadata/save.json").unwrap();
         let mut data: Value = serde_json::from_str(&content).unwrap();
 
+        data["currentArea"] = json!(currentLocation);
         data["maxHealth"] = json!(mainCharacter.stats.maxHealth);
         data["x"] = json!(meshBox.x);
         data["y"] = json!(meshBox.y);

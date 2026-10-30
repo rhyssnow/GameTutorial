@@ -1,8 +1,8 @@
 {
   "maxHealth" : 20.0,
-  "currentArea" : "tutorialTwo",
+  "currentArea" : "tutorialOne",
   "x" : 105.0,
-  "y" : 0.0,
+  "y" : 75.0,
   "mainY": 540.0,
   "mainX": 960.0
 }

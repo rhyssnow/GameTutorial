@@ -3,7 +3,7 @@
     {"background" : "src/Assets/tutorialOne.png", "foreground" : "src/Assets/tutorialOneForeground.png", "triggers" : [
       {"triggerType":  "newAreatutorialTwo", "x": 206, "y": 1007, "w": 82, "h": 0},
       {"triggerType": "setNewRespawn", "x": 517, "y": 754, "w": 153, "h": 85},
-      {"triggerType": "setNewRespawn", "x": 509, "y": 910, "w": 15, "h": 11},
+      {"triggerType": "setNewRespawn", "x": 509, "y": 910, "w": 13, "h": 9},
       {"triggerType": "setNewRespawn", "x": 358, "y": 900, "w": 14, "h": 9},
       {"triggerType": "setNewRespawn", "x": 225, "y": 947, "w": 76, "h": 53},
       {"triggerType": "setNewRespawn", "x": 773, "y": 380, "w": 210, "h": 33},

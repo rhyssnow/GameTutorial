@@ -19,6 +19,7 @@ use crate::PixelEngine::pixelEngine;
 use crate::PixelEngine::parse::{createEnvironmentFromJson, loadSaveFromJson};
 
 fn main() {
+    let mut running = true;
     let videoSubsystem = sdl3::init().unwrap().video().unwrap();
     let mut window = videoSubsystem.window("Game", 1920, 1080).position_centered().resizable().opengl().build().unwrap();
     let mut renderer = create_renderer(window.clone(), None).unwrap();
@@ -27,35 +28,49 @@ fn main() {
     renderer.clear();
     renderer.present();
 
-    let mut textureVec = Vec::new();
-
-    let surfaceMain = Surface::load_png("src/Assets/gameCharacter.png").unwrap();
-    let mut textureMain = renderer.create_texture_from_surface(&surfaceMain).unwrap();
-    textureMain.set_scale_mode(sdl3::render::ScaleMode::Nearest);
-    textureVec.push(textureMain);
-
-    let surfaceCrest = Surface::load_png("src/Assets/crest.png").unwrap();
-    let mut textureCrest = renderer.create_texture_from_surface(&surfaceCrest).unwrap();
-    textureCrest.set_scale_mode(sdl3::render::ScaleMode::Nearest);
-    textureVec.push(textureCrest);
-
-    let surfaceSword = Surface::load_png("src/Assets/mainSword.png").unwrap();
-    let mut textureSword = renderer.create_texture_from_surface(&surfaceSword).unwrap();
-    textureSword.set_scale_mode(sdl3::render::ScaleMode::Nearest);
-    textureVec.push(textureSword);
-    
     let content = fs::read_to_string(&"src/Metadata/initialSave.json").unwrap();
     let data: Value = serde_json::from_str(&content).unwrap();
     let mut file = File::create("src/Metadata/save.json").unwrap();
     file.write_all(serde_json::to_string(&data).unwrap().as_bytes()).unwrap();
+    while running {
+        let mut textureVec = Vec::new();
 
-    let save = loadSaveFromJson(&window);
-    let mut running = true;
-    gameLoop(&mut renderer, &mut window, &mut textureVec, save.0, save.1, save.2, save.3, &mut running);
+        let surfaceMain = Surface::load_png("src/Assets/gameCharacter.png").unwrap();
+        let mut textureMain = renderer.create_texture_from_surface(&surfaceMain).unwrap();
+        textureMain.set_scale_mode(sdl3::render::ScaleMode::Nearest);
+        textureVec.push(textureMain);
+
+        let surfaceCrest = Surface::load_png("src/Assets/crest.png").unwrap();
+        let mut textureCrest = renderer.create_texture_from_surface(&surfaceCrest).unwrap();
+        textureCrest.set_scale_mode(sdl3::render::ScaleMode::Nearest);
+        textureVec.push(textureCrest);
+
+        let surfaceSword = Surface::load_png("src/Assets/mainSword.png").unwrap();
+        let mut textureSword = renderer.create_texture_from_surface(&surfaceSword).unwrap();
+        textureSword.set_scale_mode(sdl3::render::ScaleMode::Nearest);
+        textureVec.push(textureSword);
+
+        let save = loadSaveFromJson(&window);
+
+        gameLoop(&mut renderer, &mut window, &mut textureVec, save.0, save.1, save.2, save.3, &mut running);
+    }
 }
 
 fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &mut Vec<Texture>, mainCharacter: mainCharacter, environmentFile: String, startX: f32, startY: f32, running: &mut bool) {
     let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*environmentFile+ ".json"))));
+
+    let mut backgroundLocation = environment.0[1].clone();
+    let mut currentLocation = "".to_string();
+    let mut currentLetter = 0;
+    for letter in backgroundLocation.chars().rev() {
+        currentLetter += 1;
+        if letter == '/' {break}
+        if currentLetter > 4 {
+            currentLocation.push(letter);
+        }
+    }
+
+    currentLocation = currentLocation.chars().rev().collect();
 
     for location in environment.0 {
         let surface = Surface::load_png(location).unwrap();
@@ -75,7 +90,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
     }
     meshBox.respawnCoords = (startX, startY);
 
-    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.3, environment.4, environment.5, "000".to_string());
+    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.3, environment.4, environment.5, currentLocation);
 
     while *running && pixelEngine.alive {
         let now = Instant::now();
@@ -101,9 +116,6 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
 
     if *running {
         delay(250);
-    }
-
-    while *running {
         renderer.set_draw_color(Color::RGB(0, 0, 0));
         renderer.clear();
 
@@ -119,6 +131,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
 
         renderer.present();
         gameOverInput(running);
+        delay(1250);
     }
 }
 
