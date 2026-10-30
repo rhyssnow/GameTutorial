@@ -12,7 +12,7 @@ use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::keyboard::Scancode;
 use sdl3::pixels::Color;
 use sdl3::video::Window;
-use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter, hazard};
+use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter, hazard, object};
 
 pub struct pixelEngine {
     meshBox: meshBox,
@@ -20,11 +20,13 @@ pub struct pixelEngine {
     enemies: Vec<enemy>,
     pub(crate) triggers: Vec<trigger::trigger>,
     hazards: Vec<hazard>,
+    objects: Vec<object>,
+    currentArea: String,
     pub(crate) alive: bool,
 }
 
 impl pixelEngine {
-    pub fn new(meshBox: meshBox, mainCharacter: mainCharacter, enemies: Vec<enemy>, triggers: Vec<trigger::trigger>, hazards: Vec<hazard>) -> pixelEngine {pixelEngine{ meshBox, mainCharacter, enemies, alive: true, triggers, hazards}}
+    pub fn new(meshBox: meshBox, mainCharacter: mainCharacter, enemies: Vec<enemy>, triggers: Vec<trigger::trigger>, hazards: Vec<hazard>, objects: Vec<object>, currentArea: String) -> pixelEngine {pixelEngine{ meshBox, mainCharacter, enemies, alive: true, triggers, hazards, objects, currentArea}}
 
     pub fn input (&mut self, window: &Window, textureVec: &Vec<Texture>, running: &mut bool) {
         let mut eventPump = sdl3::init().unwrap().event_pump().unwrap();
@@ -141,6 +143,10 @@ impl pixelEngine {
             self.mainCharacter.stats.stamina -= 3.0;
             self.mainCharacter.swordAttack.swingCooldown = Instant::now();
             usedStamina = true;
+        }
+
+        for object in self.objects.iter_mut() {
+            object.updateInput(&self.mainCharacter, window, &keyboardState, &self.meshBox);
         }
 
         let directions = [moveBackInDirection.clone(), moveMainInDirection.clone()].concat();
@@ -262,7 +268,7 @@ impl pixelEngine {
             trigger.trigger(&mut self.meshBox, &mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, running);
         }
         for hazard in self.hazards.iter_mut() {
-            hazard.update(&mut self.mainCharacter, &mut self.meshBox, &mut self.alive, window)
+            hazard.update(&mut self.mainCharacter, &mut self.meshBox, &mut self.alive)
         }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {
@@ -277,7 +283,6 @@ impl pixelEngine {
     }
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, window: &Window) {
         renderer.set_draw_color(Color::RGB(50, 155, 50));
-        renderer.clear();
 
         let backgroundRenderArea = FRect::new(0.0, 0.0, window.size_in_pixels().0 as f32, window.size_in_pixels().1 as f32);
         let crestRenderArea = FRect::new(0.0, 0.0, 104.0, 115.0);
@@ -286,18 +291,22 @@ impl pixelEngine {
 
         let mut renderThings = Vec::new();
         if self.mainCharacter.render {
-            renderThings.push((0, self.mainCharacter.y / 6.0 + self.meshBox.y, 0));
+            renderThings.push((0, (self.mainCharacter.y + self.mainCharacter.hitBox.h) / 6.0 + self.meshBox.y, 0));
         }
         for enemy in 0.. self.enemies.len() {
             if self.enemies[enemy].render {
-                renderThings.push((enemy, self.enemies[enemy].y, 1));
+                renderThings.push((enemy, self.enemies[enemy].y + self.enemies[enemy].hitBox.h, 1));
             }
+        }
+        for object in 0..self.objects.len() {
+            renderThings.push((object, self.objects[object].area.y + self.objects[object].area.h, 2));
         }
         renderThings.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
         for thing in renderThings {
             match thing.2 {
                 0 => self.mainCharacter.render(textureVec,renderer),
                 1 => self.enemies[thing.0].render(textureVec, renderer, &mut self.meshBox),
+                2 => self.objects[thing.0].render(renderer, &self.meshBox, textureVec, window),
                 _ => {}
             }
         }
@@ -309,6 +318,7 @@ impl pixelEngine {
         renderer.copy(&textureVec[1], None, crestRenderArea).unwrap();
 
         renderer.present();
+        renderer.clear();
     }
 
 }

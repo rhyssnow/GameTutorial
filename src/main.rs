@@ -3,6 +3,9 @@
 
 mod PixelEngine;
 
+use std::fs;
+use std::fs::File;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 use sdl3::pixels::Color;
@@ -10,7 +13,7 @@ use sdl3::render::{create_renderer, WindowCanvas, FRect, Texture};
 use sdl3::surface::Surface;
 use sdl3::timer::delay;
 use sdl3::video::Window;
-use std::thread;
+use serde_json::{json, Value};
 use crate::PixelEngine::basic::mainCharacter;
 use crate::PixelEngine::pixelEngine;
 use crate::PixelEngine::parse::{createEnvironmentFromJson, loadSaveFromJson};
@@ -40,6 +43,11 @@ fn main() {
     let mut textureSword = renderer.create_texture_from_surface(&surfaceSword).unwrap();
     textureSword.set_scale_mode(sdl3::render::ScaleMode::Nearest);
     textureVec.push(textureSword);
+    
+    let content = fs::read_to_string(&"src/Metadata/initialSave.json").unwrap();
+    let data: Value = serde_json::from_str(&content).unwrap();
+    let mut file = File::create("src/Metadata/save.json").unwrap();
+    file.write_all(serde_json::to_string(&data).unwrap().as_bytes()).unwrap();
 
     let save = loadSaveFromJson(&window);
     let mut running = true;
@@ -49,22 +57,8 @@ fn main() {
 fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &mut Vec<Texture>, mainCharacter: mainCharacter, environmentFile: String, startX: f32, startY: f32, running: &mut bool) {
     let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*environmentFile+ ".json"))));
 
-    let mut threads = Vec::new();
-
     for location in environment.0 {
-        let thread = thread::spawn(move || {
-            let start_time = Instant::now();
-
-            let surface = Surface::load_png(location).unwrap();
-            println!("starttime {:?}", start_time.elapsed());
-
-            return surface;
-        });
-        threads.push(thread);
-    }
-
-    for thread in threads {
-        let surface  =thread.join().unwrap();
+        let surface = Surface::load_png(location).unwrap();
         let mut texture = renderer.create_texture_from_surface(&surface).unwrap();
         texture.set_scale_mode(sdl3::render::ScaleMode::Nearest);
         textureVec.push(texture);
@@ -81,7 +75,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
     }
     meshBox.respawnCoords = (startX, startY);
 
-    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.3, environment.4);
+    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.3, environment.4, environment.5, "000".to_string());
 
     while *running && pixelEngine.alive {
         let now = Instant::now();
@@ -90,11 +84,11 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
         pixelEngine.render(&textureVec, renderer, &window);
         pixelEngine.update(&mut textureVec, renderer, window, running);
 
-        let mut elapsed = now.elapsed().as_millis();
-        if elapsed > 16 {
-            elapsed = 16;
+        let mut elapsed = now.elapsed().as_nanos() as f32 / 1000000000.0;
+        if elapsed.floor() > 16.0 {
+            elapsed = 16.0;
         }
-        let extraTime = 16 - elapsed;
+        let extraTime = 16 - elapsed.floor() as usize;
         delay(extraTime as u32);
     }
 

@@ -118,10 +118,10 @@
       {"triggerType":  "impassable", "x": 265, "y": 89, "w": 4, "h": 10},
       {"triggerType":  "impassable", "x": 261, "y": 100, "w": 4, "h": 10},
       {"triggerType":  "impassable", "x": 265, "y": 110, "w": 10, "h": 4},
-      {"triggerType":  "impassable", "x": 275, "y": 225, "w": 12, "h": 3},
+      {"triggerType":  "impassable", "x": 275, "y": 115, "w": 12, "h": 3},
       {"triggerType":  "impassable", "x": 286, "y": 118, "w": 8, "h": 8},
       {"triggerType":  "impassable", "x": 294, "y": 126, "w": 26, "h": 7},
-      {"triggerType":  "impassable", "x": 315, "y": 141, "w": 5, "h": 9},
+      {"triggerType":  "impassable", "x": 315, "y": 133, "w": 120, "h": 17},
       {"triggerType":  "impassable", "x": 319, "y": 150, "w": 7, "h": 4},
       {"triggerType":  "impassable", "x": 324, "y": 154, "w": 12, "h": 4},
       {"triggerType":  "impassable", "x": 334, "y": 158, "w": 4, "h": 10},
@@ -209,5 +209,10 @@
     {"enemyType" : "wolfMissile", "x" : 160, "y" : 170, "roamX": 160, "roamY": 170, "roamW": 144, "roamH": 114},
     {"enemyType" : "wolfMissile", "x" : 320, "y" : 350, "roamX": 160, "roamY": 170, "roamW": 144, "roamH": 114},
     {"enemyType" : "wolfMissile", "x" : 435, "y" : 607, "roamX": 435, "roamY": 607, "roamW": 56, "roamH": 138}
-  ]
+  ], "objects" : [
+    {"objectType" : "litBeacon", "texture": "tutorialOne.png", "x": 809, "y": 784, "w": 31, "h": 58, "ex": 779, "ey": 765, "ew": 91, "eh": 96, "animations" : [
+      {"x": 0, "y": 0, "w": 1, "h": 1},
+      {"x": 300, "y": 300, "w": 1, "h": 1}
+    ]}
+]
 }

@@ -1,6 +1,1 @@
-{
-  "maxHealth" : 20.0,
-  "currentArea" : "tutorialTwo",
-  "x" : 105.0,
-  "y" : 0.0
-}
+{"currentArea":"tutorialTwo","mainX":960.0,"mainY":540.0,"maxHealth":20.0,"x":105.0,"y":0.0}

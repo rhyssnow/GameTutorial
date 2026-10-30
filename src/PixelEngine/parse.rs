@@ -4,7 +4,7 @@ use serde_json::Value;
 use sdl3::render::FRect;
 use sdl3::video::Window;
 use crate::PixelEngine::attack::attacks;
-use crate::PixelEngine::basic::{enemy, hazard, mainCharacter, meshBox};
+use crate::PixelEngine::basic::{enemy, hazard, mainCharacter, meshBox, object};
 use crate::PixelEngine::roam::roamPattern;
 use crate::PixelEngine::trigger::trigger;
 
@@ -12,13 +12,13 @@ pub fn loadSaveFromJson (window: &Window) -> (mainCharacter, String, f32, f32) {
     let content = fs::read_to_string(&"src/Metadata/save.json").unwrap();
     let data: Value = serde_json::from_str(&content).unwrap();
 
-    let mainCharacter = mainCharacter::new(window.size_in_pixels().0 as f32 /2.0 - 35.0, window.size_in_pixels().1 as f32 /2.0, data["maxHealth"].as_f64().unwrap() as f32);
+    let mainCharacter = mainCharacter::new(data["mainX"].as_f64().unwrap() as f32, data["mainY"].as_f64().unwrap() as f32, data["maxHealth"].as_f64().unwrap() as f32);
     let path = data["currentArea"].as_str().unwrap();
 
     (mainCharacter, path.to_string(), data["x"].as_f64().unwrap() as f32, data["y"].as_f64().unwrap() as f32)
 }
 
-pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy>, Vec<trigger>, Vec<hazard>) {
+pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy>, Vec<trigger>, Vec<hazard>, Vec<object>) {
     let mut meshBox: meshBox;
     let mut textureVec = Vec::new();
     let mut enemies = Vec::new();
@@ -27,6 +27,7 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
     let data: Value = serde_json::from_str(&content).unwrap();
     let mut triggerVec = Vec::new();
     let mut hazardVec = Vec::new();
+    let mut objectVec = Vec::new();
 
     for meshBox in data["meshBox"].as_array().unwrap() {
         textureVec.push(meshBox["foreground"].as_str().unwrap().to_string());
@@ -116,5 +117,32 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
         }
         texturePos += 1;
     }
-    (textureVec, meshBox, enemies, triggerVec, hazardVec) //the meshbox needs its width, height and x, y coordinates set before it is usable.
+    for object in data["objects"].as_array().unwrap() {
+        let area = FRect::new(
+            object["x"].as_f64().unwrap() as f32,
+            object["y"].as_f64().unwrap() as f32,
+            object["w"].as_f64().unwrap() as f32,
+            object["h"].as_f64().unwrap() as f32,
+        );
+        let areaOfEffect = FRect::new(
+            object["ex"].as_f64().unwrap() as f32,
+            object["ey"].as_f64().unwrap() as f32,
+            object["ew"].as_f64().unwrap() as f32,
+            object["eh"].as_f64().unwrap() as f32,
+        );
+        let mut animations = Vec::new();
+        for frect in object["animations"].as_array().unwrap() {
+            animations.push(FRect::new(
+                frect["x"].as_f64().unwrap() as f32,
+                frect["y"].as_f64().unwrap() as f32,
+                frect["w"].as_f64().unwrap() as f32,
+                frect["h"].as_f64().unwrap() as f32,
+            ))
+        }
+        let newObject = object::new(area, areaOfEffect, object["objectType"].as_str().unwrap().to_string(), animations, texturePos);
+        objectVec.push(newObject);
+        texturePos += 1;
+        textureVec.push("src/Assets/".to_string() + object["texture"].as_str().unwrap());
+    }
+    (textureVec, meshBox, enemies, triggerVec, hazardVec, objectVec) //the meshbox needs its width, height and x, y coordinates set before it is usable.
 }
