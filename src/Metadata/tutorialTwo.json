@@ -121,7 +121,7 @@
       {"triggerType":  "impassable", "x": 275, "y": 115, "w": 12, "h": 3},
       {"triggerType":  "impassable", "x": 286, "y": 118, "w": 8, "h": 8},
       {"triggerType":  "impassable", "x": 294, "y": 126, "w": 26, "h": 7},
-      {"triggerType":  "impassable", "x": 315, "y": 133, "w": 120, "h": 17},
+      {"triggerType":  "impassable", "x": 315, "y": 133, "w": 12, "h": 17},
       {"triggerType":  "impassable", "x": 319, "y": 150, "w": 7, "h": 4},
       {"triggerType":  "impassable", "x": 324, "y": 154, "w": 12, "h": 4},
       {"triggerType":  "impassable", "x": 334, "y": 158, "w": 4, "h": 10},
