@@ -130,7 +130,6 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
         renderer.copy(&gameOverTexture, None, deathMsgRect).unwrap();
 
         renderer.present();
-        gameOverInput(running);
         delay(1250);
     }
 }

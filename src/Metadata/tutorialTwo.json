@@ -210,9 +210,10 @@
     {"enemyType" : "wolfMissile", "x" : 320, "y" : 350, "roamX": 160, "roamY": 170, "roamW": 144, "roamH": 114},
     {"enemyType" : "wolfMissile", "x" : 435, "y" : 607, "roamX": 435, "roamY": 607, "roamW": 56, "roamH": 138}
   ], "objects" : [
-    {"objectType" : "litBeacon", "texture": "tutorialOne.png", "x": 809, "y": 784, "w": 31, "h": 58, "ex": 779, "ey": 765, "ew": 91, "eh": 96, "animations" : [
-      {"x": 0, "y": 0, "w": 1, "h": 1},
-      {"x": 300, "y": 300, "w": 1, "h": 1}
+    {"objectType" : "litBeacon", "texture": "beacon.png", "x": 809, "y": 775, "w": 15, "h": 50, "ex": 779, "ey": 750, "ew": 91, "eh": 130, "animations" : [
+      {"x": 3, "y": 3, "w": 13, "h": 46},
+      {"x": 19, "y": 3, "w": 13, "h": 46},
+      {"x": 35, "y": 3, "w": 13, "h": 46}
     ]}
 ]
 }

@@ -265,7 +265,7 @@ impl pixelEngine {
         }
 
         for trigger in self.triggers.iter_mut() {
-            trigger.trigger(&mut self.meshBox, &mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, running);
+            trigger.trigger(&mut self.meshBox, &mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, running, &mut self.alive);
         }
         for hazard in self.hazards.iter_mut() {
             hazard.update(&mut self.mainCharacter, &mut self.meshBox, &mut self.alive)

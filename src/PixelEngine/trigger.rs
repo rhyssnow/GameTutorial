@@ -14,7 +14,7 @@ pub struct trigger {
 
 impl trigger {
     pub fn new(triggerType: String, mut area: FRect) -> trigger { trigger{triggerType, area}}
-    pub fn trigger(&mut self, meshBox: &mut meshBox, mainCharacter: &mut mainCharacter, enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool) {
+    pub fn trigger(&mut self, meshBox: &mut meshBox, mainCharacter: &mut mainCharacter, enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool, alive: &mut bool) {
         let mut newArea = false;
         let mut file = String::new();
         let mut index = 0;
@@ -51,7 +51,7 @@ impl trigger {
         );
 
         if newArea {
-            loadNewArea(file, hitbox, meshBox, renderer, window, mainCharacter, textureVec, running);
+            loadNewArea(file, hitbox, meshBox, renderer, window, mainCharacter, textureVec, running, alive);
         }
 
         match self.triggerType.as_str() {
@@ -121,7 +121,7 @@ fn setNewRespawn (area: FRect, mainCharacter: &mut mainCharacter, meshBox: &mut 
     }
 }
 
-fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mut mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool) {
+fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mut mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool, alive: &mut bool) {
     if hitboxDetector(mainCharacter.hitBox, area) {
         let calctime = Instant::now();
         let startX: f32;
@@ -163,5 +163,6 @@ fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut Win
         println!("clonetime {:?}", clonetime.elapsed());
 
         gameLoop(renderer, window, textureVec, mainCharacterClone, file, startX, startY, running);
+        *alive = false;
     }
 }

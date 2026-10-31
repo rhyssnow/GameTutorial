@@ -156,7 +156,7 @@
       {"triggerType": "impassable", "x": 670, "y": 266, "w": 26, "h": 16},
       {"triggerType": "impassable", "x": 534, "y": 261, "w": 26, "h": 16},
       {"triggerType": "impassable", "x": 434, "y": 282, "w": 26, "h": 16},
-      {"triggerType": "impassable", "x": 295, "y": 986, "w": 26, "h": 16}
+      {"triggerType": "impassable", "x": 286, "y": 986, "w": 35, "h": 16}
 
     ], "hazards" : [
       {"damage": 2.5, "x": 721, "y": 494, "w": 32, "h": 37},
