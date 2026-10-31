@@ -231,7 +231,7 @@ impl mainCharacter {
         }
     }
     pub fn update (&mut self) {
-        if self.timeSinceHit.elapsed().as_millis() <= 250 {
+        if self.timeSinceHit.elapsed().as_millis() <= 400 {
             self.render = !self.render;
             self.immune = true;
         }
