@@ -11,7 +11,7 @@ use sdl3::pixels::Color;
 use sdl3::video::Window;
 use serde_json::{json, Value};
 use crate::PixelEngine::attack::attacks;
-use crate::PixelEngine::hitboxDetector;
+use crate::PixelEngine::{hitboxDetector, movementCalculator};
 use crate::PixelEngine::roam::roamPattern;
 
 pub struct meshBox {
@@ -77,7 +77,7 @@ pub struct hazard {
 
 impl hazard {
     pub fn new(damage: f32, area: FRect) -> hazard {hazard{damage, area}}
-    pub fn update(&mut self, mainCharacter: &mut mainCharacter, meshBox: &mut meshBox, alive: &mut bool) {
+    pub fn update(&mut self, mainCharacter: &mut mainCharacter, enemies: &mut Vec<enemy>, meshBox: &mut meshBox, alive: &mut bool, textureVec: &Vec<Texture>) {
         let hitbox = FRect::new((self.area.x - meshBox.x) * 6.0, (self.area.y - meshBox.y) * 6.0, self.area.w * 6.0 , self.area.h * 6.0);
         let mainHitbox = FRect::new(
             mainCharacter.x + 3.5,
@@ -97,6 +97,20 @@ impl hazard {
             meshBox.y = meshBox.respawnCoords.1;
             mainCharacter.x = mainCharacter.respawnCoords.0;
             mainCharacter.y = mainCharacter.respawnCoords.1;
+        }
+        for mut enemy in enemies.iter_mut() {
+            if hitboxDetector(enemy.hitBox, hitbox) {
+                let speed = 1.0;
+
+                let dx = hitbox.x - enemy.hitBox.x;
+                let dy = hitbox.y - enemy.hitBox.y;
+
+                let m = movementCalculator(dx, dy, speed);
+
+                enemy.health -= 0.1;
+                enemy.updatePosition(-m.0, -m.1, &textureVec[meshBox.texturePos]);
+                enemy.timeSinceHit = Instant::now();
+            }
         }
     }
 }
@@ -129,7 +143,6 @@ impl object{
             if self.animationState > self.textureRect.len() - 1{
                 self.animationState = 0;
             }
-            println!("{}", self.animationState);
         }
         match self.objectType.as_str(){
             "litBeacon" => litBeaconInput(self.areaOfEffect, mainCharacter, window, keyboardState, meshBox, currentLocation),

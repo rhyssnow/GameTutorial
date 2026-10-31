@@ -210,7 +210,7 @@ impl pixelEngine {
             }
         }
     }
-    pub fn update(&mut self, mut textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool) {
+    pub fn update(&mut self, mut textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool, parentFunc: &mut bool) {
         self.mainCharacter.update();
         for mut enemy in self.enemies.iter_mut() {
             let enemyUsedHitbox = FRect::new(
@@ -265,10 +265,10 @@ impl pixelEngine {
         }
 
         for trigger in self.triggers.iter_mut() {
-            trigger.trigger(&mut self.meshBox, &mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, running, &mut self.alive);
+            trigger.trigger(&mut self.meshBox, &mut self.mainCharacter, &mut self.enemies, &mut textureVec, renderer, window, running, parentFunc);
         }
         for hazard in self.hazards.iter_mut() {
-            hazard.update(&mut self.mainCharacter, &mut self.meshBox, &mut self.alive)
+            hazard.update(&mut self.mainCharacter, &mut self.enemies, &mut self.meshBox, &mut self.alive, textureVec);
         }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {

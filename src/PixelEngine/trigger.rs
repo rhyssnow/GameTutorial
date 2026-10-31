@@ -121,7 +121,7 @@ fn setNewRespawn (area: FRect, mainCharacter: &mut mainCharacter, meshBox: &mut 
     }
 }
 
-fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mut mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool, alive: &mut bool) {
+fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mut mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool, parentFunc: &mut bool) {
     if hitboxDetector(mainCharacter.hitBox, area) {
         let calctime = Instant::now();
         let startX: f32;
@@ -145,24 +145,14 @@ fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut Win
         } else {
             startY = meshBox.y;
         }
-
-        println!("calctime {:?}", calctime.elapsed());
-
-        let vectime = Instant::now();
-
+        
         while textureVec.len() > 3 {
             textureVec.pop().unwrap();
         }
-
-        println!("vectime {:?}", vectime.elapsed());
-
-        let clonetime = Instant::now();
-
+        
         let mainCharacterClone = mainCharacter.clone();
-
-        println!("clonetime {:?}", clonetime.elapsed());
-
+        
         gameLoop(renderer, window, textureVec, mainCharacterClone, file, startX, startY, running);
-        *alive = false;
+        *parentFunc = true;
     }
 }

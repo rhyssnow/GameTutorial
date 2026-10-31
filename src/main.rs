@@ -59,6 +59,7 @@ fn main() {
 fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &mut Vec<Texture>, mainCharacter: mainCharacter, environmentFile: String, startX: f32, startY: f32, running: &mut bool) {
     let environment = createEnvironmentFromJson(PathBuf::from(Path::new(&("src/Metadata/".to_string() + &*environmentFile+ ".json"))));
 
+    let mut parentFunc = false;
     let mut backgroundLocation = environment.0[1].clone();
     let mut currentLocation = "".to_string();
     let mut currentLetter = 0;
@@ -92,12 +93,12 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
 
     let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.3, environment.4, environment.5, currentLocation);
 
-    while *running && pixelEngine.alive {
+    while *running && pixelEngine.alive && !parentFunc{
         let now = Instant::now();
 
         pixelEngine.input(window, &textureVec, running);
         pixelEngine.render(&textureVec, renderer, &window);
-        pixelEngine.update(&mut textureVec, renderer, window, running);
+        pixelEngine.update(&mut textureVec, renderer, window, running, &mut parentFunc);
 
         let mut elapsed = now.elapsed().as_nanos() as f32 / 1000000000.0;
         if elapsed.floor() > 16.0 {
@@ -114,7 +115,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
     let gameOverSurface = font.render("You Died").blended(Color::RGB(150, 50, 50)).unwrap();
     let gameOverTexture = renderer.create_texture_from_surface(&gameOverSurface).unwrap();
 
-    if *running {
+    if *running && !parentFunc {
         delay(250);
         renderer.set_draw_color(Color::RGB(0, 0, 0));
         renderer.clear();
