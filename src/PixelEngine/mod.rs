@@ -300,12 +300,12 @@ impl pixelEngine {
         }
         for enemy in 0.. self.enemies.len() {
             if self.enemies[enemy].render {
-                renderThings.push((enemy, self.enemies[enemy].y + self.enemies[enemy].hitBox.h, 1));
+                renderThings.push((enemy, self.enemies[enemy].y + self.enemies[enemy].hitBox.h /12.0, 1));
             }
         }
         for boss in 0.. self.bosses.len() {
             if self.bosses[boss].render {
-                renderThings.push((boss, self.bosses[boss].y + self.bosses[boss].hitbox.h, 2));
+                renderThings.push((boss, self.bosses[boss].y + self.bosses[boss].hitbox.h /12.0, 2));
             }
         }
         for object in 0..self.objects.len() {
