@@ -2,13 +2,14 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use serde_json::Value;
 use sdl3::render::FRect;
-use sdl3::video::Window;
 use crate::PixelEngine::attack::attacks;
-use crate::PixelEngine::basic::{enemy, hazard, mainCharacter, meshBox, object};
+use crate::PixelEngine::basic::{enemy, hazard, mainCharacter, meshBox};
+use crate::PixelEngine::bosses::boss;
+use crate::PixelEngine::objects::object;
 use crate::PixelEngine::roam::roamPattern;
 use crate::PixelEngine::trigger::trigger;
 
-pub fn loadSaveFromJson (window: &Window) -> (mainCharacter, String, f32, f32) {
+pub fn loadSaveFromJson () -> (mainCharacter, String, f32, f32) {
     let content = fs::read_to_string(&"src/Metadata/save.json").unwrap();
     let data: Value = serde_json::from_str(&content).unwrap();
 
@@ -18,16 +19,17 @@ pub fn loadSaveFromJson (window: &Window) -> (mainCharacter, String, f32, f32) {
     (mainCharacter, path.to_string(), data["x"].as_f64().unwrap() as f32, data["y"].as_f64().unwrap() as f32)
 }
 
-pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy>, Vec<trigger>, Vec<hazard>, Vec<object>) {
+pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<enemy>, Vec<trigger>, Vec<hazard>, Vec<object>, Vec<boss>) {
     let mut meshBox: meshBox;
     let mut textureVec = Vec::new();
     let mut enemies = Vec::new();
-
-    let content = fs::read_to_string(&file).unwrap();
-    let data: Value = serde_json::from_str(&content).unwrap();
     let mut triggerVec = Vec::new();
     let mut hazardVec = Vec::new();
     let mut objectVec = Vec::new();
+    let mut bosses = Vec::new();
+
+    let content = fs::read_to_string(&file).unwrap();
+    let data: Value = serde_json::from_str(&content).unwrap();
 
     for meshBox in data["meshBox"].as_array().unwrap() {
         textureVec.push(meshBox["foreground"].as_str().unwrap().to_string());
@@ -144,5 +146,66 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
         texturePos += 1;
         textureVec.push("src/Assets/".to_string() + object["texture"].as_str().unwrap());
     }
-    (textureVec, meshBox, enemies, triggerVec, hazardVec, objectVec) //the meshbox needs its width, height and x, y coordinates set before it is usable.
+
+    let content = fs::read_to_string(Path::new("src/Metadata/bosses.json")).unwrap();
+    let bossData: Value = serde_json::from_str(&content).unwrap();
+
+    for boss in data["bosses"].as_array().unwrap() {
+        let mut up = Vec::new();
+        let mut down = Vec::new();
+        let mut left = Vec::new();
+        let mut right = Vec::new();
+
+        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["up"].as_array().unwrap() {
+            up.push(FRect::new(
+                frect["x"].as_f64().unwrap() as f32,
+                frect["y"].as_f64().unwrap() as f32,
+                frect["w"].as_f64().unwrap() as f32,
+                frect["h"].as_f64().unwrap() as f32,
+            ))
+        }
+        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["up"].as_array().unwrap() {
+            down.push(FRect::new(
+                frect["x"].as_f64().unwrap() as f32,
+                frect["y"].as_f64().unwrap() as f32,
+                frect["w"].as_f64().unwrap() as f32,
+                frect["h"].as_f64().unwrap() as f32,
+            ))
+        }
+        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["up"].as_array().unwrap() {
+            left.push(FRect::new(
+                frect["x"].as_f64().unwrap() as f32,
+                frect["y"].as_f64().unwrap() as f32,
+                frect["w"].as_f64().unwrap() as f32,
+                frect["h"].as_f64().unwrap() as f32,
+            ))
+        }
+        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["up"].as_array().unwrap() {
+            right.push(FRect::new(
+                frect["x"].as_f64().unwrap() as f32,
+                frect["y"].as_f64().unwrap() as f32,
+                frect["w"].as_f64().unwrap() as f32,
+                frect["h"].as_f64().unwrap() as f32,
+            ))
+        }
+
+
+        bosses.push(boss::new(
+            boss["boss"].as_str().unwrap().to_string(),
+            boss["x"].as_f64().unwrap() as f32,
+            boss["y"].as_f64().unwrap() as f32,
+            boss["tx"].as_f64().unwrap() as f32,
+            boss["ty"].as_f64().unwrap() as f32,
+            boss["tw"].as_f64().unwrap() as f32,
+            boss["th"].as_f64().unwrap() as f32,
+            up,
+            down,
+            left,
+            right,
+            texturePos
+        ));
+        textureVec.push("src/Assets/".to_string() + bossData[boss["boss"].as_str().unwrap().to_string()]["textureFile"].as_str().unwrap());
+        texturePos += 1;
+    }
+    (textureVec, meshBox, enemies, triggerVec, hazardVec, objectVec, bosses) //the meshbox needs its width, height and x, y coordinates set before it is usable.
 }

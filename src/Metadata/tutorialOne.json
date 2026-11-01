@@ -276,5 +276,7 @@
     {"enemyType" : "wolfMissile", "x" : 660, "y" : 755, "roamX": 635, "roamY": 735, "roamW": 75, "roamH": 30}
   ], "objects" : [
 
-  ]
+  ], "bosses" : [
+
+]
 }

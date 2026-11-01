@@ -4,7 +4,6 @@
 mod PixelEngine;
 
 use std::fs;
-use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
@@ -13,7 +12,7 @@ use sdl3::render::{create_renderer, WindowCanvas, FRect, Texture};
 use sdl3::surface::Surface;
 use sdl3::timer::delay;
 use sdl3::video::Window;
-use serde_json::{json, Value};
+use serde_json::{Value};
 use crate::PixelEngine::basic::mainCharacter;
 use crate::PixelEngine::pixelEngine;
 use crate::PixelEngine::parse::{createEnvironmentFromJson, loadSaveFromJson};
@@ -50,7 +49,7 @@ fn main() {
         textureSword.set_scale_mode(sdl3::render::ScaleMode::Nearest);
         textureVec.push(textureSword);
 
-        let save = loadSaveFromJson(&window);
+        let save = loadSaveFromJson();
 
         gameLoop(&mut renderer, &mut window, &mut textureVec, save.0, save.1, save.2, save.3, &mut running);
     }
@@ -91,7 +90,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
     }
     meshBox.respawnCoords = (startX, startY);
 
-    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.3, environment.4, environment.5, currentLocation);
+    let mut pixelEngine = pixelEngine::new(meshBox, mainCharacter, environment.2, environment.6, environment.3, environment.4, environment.5, currentLocation);
 
     while *running && pixelEngine.alive && !parentFunc{
         let now = Instant::now();
@@ -135,7 +134,7 @@ fn gameLoop(renderer: &mut WindowCanvas, window: &mut Window, mut textureVec: &m
     }
 }
 
-fn gameOverInput (running: &mut bool) {
+/*fn gameOverInput (running: &mut bool) {
     let mut eventPump = sdl3::init().unwrap().event_pump().unwrap();
 
     for event in eventPump.poll_iter() {
@@ -147,4 +146,4 @@ fn gameOverInput (running: &mut bool) {
             _ => {}
         }
     }
-}
+}*/

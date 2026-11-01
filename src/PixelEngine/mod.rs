@@ -6,13 +6,17 @@ pub mod attack;
 pub mod parse;
 pub mod trigger;
 pub mod basic;
+pub mod bosses;
+pub mod objects;
 
 use std::time::Instant;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::keyboard::Scancode;
 use sdl3::pixels::Color;
 use sdl3::video::Window;
-use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter, hazard, object};
+use crate::PixelEngine::basic::{enemy, meshBox, mainCharacter, hazard};
+use crate::PixelEngine::bosses::boss;
+use crate::PixelEngine::objects::object;
 
 pub struct pixelEngine {
     meshBox: meshBox,
@@ -23,10 +27,11 @@ pub struct pixelEngine {
     objects: Vec<object>,
     currentArea: String,
     pub(crate) alive: bool,
+    bosses: Vec<boss>,
 }
 
 impl pixelEngine {
-    pub fn new(meshBox: meshBox, mainCharacter: mainCharacter, enemies: Vec<enemy>, triggers: Vec<trigger::trigger>, hazards: Vec<hazard>, objects: Vec<object>, currentArea: String) -> pixelEngine {pixelEngine{ meshBox, mainCharacter, enemies, alive: true, triggers, hazards, objects, currentArea}}
+    pub fn new(meshBox: meshBox, mainCharacter: mainCharacter, enemies: Vec<enemy>, bosses: Vec<boss>, triggers: Vec<trigger::trigger>, hazards: Vec<hazard>, objects: Vec<object>, currentArea: String) -> pixelEngine {pixelEngine{ meshBox, mainCharacter, enemies, bosses, alive: true, triggers, hazards, objects, currentArea}}
 
     pub fn input (&mut self, window: &Window, textureVec: &Vec<Texture>, running: &mut bool) {
         let mut eventPump = sdl3::init().unwrap().event_pump().unwrap();
@@ -298,15 +303,21 @@ impl pixelEngine {
                 renderThings.push((enemy, self.enemies[enemy].y + self.enemies[enemy].hitBox.h, 1));
             }
         }
+        for boss in 0.. self.bosses.len() {
+            if self.bosses[boss].render {
+                renderThings.push((boss, self.bosses[boss].y + self.bosses[boss].hitbox.h, 2));
+            }
+        }
         for object in 0..self.objects.len() {
-            renderThings.push((object, self.objects[object].area.y + self.objects[object].area.h, 2));
+            renderThings.push((object, self.objects[object].area.y + self.objects[object].area.h, 3));
         }
         renderThings.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
         for thing in renderThings {
             match thing.2 {
                 0 => self.mainCharacter.render(textureVec,renderer),
                 1 => self.enemies[thing.0].render(textureVec, renderer, &mut self.meshBox),
-                2 => self.objects[thing.0].render(renderer, &self.meshBox, textureVec, window),
+                2 => self.bosses[thing.0].render(textureVec, renderer, &mut self.meshBox),
+                3 => self.objects[thing.0].render(renderer, &self.meshBox, textureVec, window),
                 _ => {}
             }
         }

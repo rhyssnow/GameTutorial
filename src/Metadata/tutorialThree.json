@@ -11,5 +11,7 @@
 
   ], "objects" : [
 
+  ], "bosses" : [
+    {"boss" : "protectorKnight", "x": 150.0, "y": 810.0, "tx": 50.0, "ty": 710.0, "tw": 200.0, "th": 200.0}
   ]
 }

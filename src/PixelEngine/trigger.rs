@@ -1,5 +1,4 @@
-use std::time::Instant;
-use sdl3::pixels::Color;
+use std::env::remove_var;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::video::Window;
 use crate::gameLoop;
@@ -55,14 +54,14 @@ impl trigger {
         }
 
         match self.triggerType.as_str() {
-            "impassable" => impassable(mainCharacter, hitbox, window, enemies, textureVec),
+            "impassable" => impassable(mainCharacter, hitbox, enemies, textureVec),
             "setNewRespawn" => setNewRespawn(hitbox, mainCharacter, meshBox),
             _ => {}
         }
     }
 }
 
-fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, window: &Window, enemies: &mut Vec<enemy>, textureVec: &Vec<Texture>) {
+fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, enemies: &mut Vec<enemy>, textureVec: &Vec<Texture>) {
 
     if hitboxDetector(hitBox, mainCharacter.hitBox) { 
         let topMain = mainCharacter.hitBox.y;
@@ -123,7 +122,6 @@ fn setNewRespawn (area: FRect, mainCharacter: &mut mainCharacter, meshBox: &mut 
 
 fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut WindowCanvas, window: &mut Window, mainCharacter: &mut mainCharacter, textureVec: &mut Vec<Texture>, running: &mut bool, parentFunc: &mut bool) {
     if hitboxDetector(mainCharacter.hitBox, area) {
-        let calctime = Instant::now();
         let startX: f32;
         if area.x > textureVec[3].width() as f32 - 10.0 {
             startX = 0.0;
@@ -149,10 +147,8 @@ fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut Win
         while textureVec.len() > 3 {
             textureVec.pop().unwrap();
         }
-        
-        let mainCharacterClone = mainCharacter.clone();
-        
-        gameLoop(renderer, window, textureVec, mainCharacterClone, file, startX, startY, running);
+
+        gameLoop(renderer, window, textureVec, mainCharacter.clone(), file, startX, startY, running);
         *parentFunc = true;
     }
 }
