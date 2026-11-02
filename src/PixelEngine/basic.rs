@@ -135,7 +135,7 @@ pub struct mainCharacter{
     pub respawnCoords: (f32, f32),
 }
 impl mainCharacter {
-    pub fn new(x: f32, y: f32, health: f32) -> mainCharacter {mainCharacter{
+    pub fn new(x: f32, y: f32, health: f32, damage: f32) -> mainCharacter {mainCharacter{
         x,
         y,
         direction: "down".to_string(),
@@ -145,7 +145,7 @@ impl mainCharacter {
         characterRight: [FRect::new(1.0, 17.0, 10.0, 16.0), FRect::new(12.0, 17.0, 10.0, 16.0), FRect::new(23.0, 17.0, 10.0, 16.0)],
         characterLeft: [FRect::new(1.0, 1.0, 10.0, 16.0), FRect::new(12.0, 1.0, 10.0, 16.0), FRect::new(23.0, 1.0, 10.0, 16.0)],
         hitBox: FRect{x, y, w: 70.0, h: 112.0},
-        stats: stats::new(health),
+        stats: stats::new(health, damage),
         swordAttack: swordAttack::new("up".to_string()),
         lastPhaseChange: Instant::now(),
         immune: false,
@@ -270,6 +270,7 @@ impl mainCharacter {
 pub struct stats {
     pub health: f32,
     pub(crate) maxHealth: f32,
+    pub damage: f32,
     pub stamina: f32,
     pub maxStamina: f32,
     pub(crate) mana: f32,
@@ -277,7 +278,7 @@ pub struct stats {
     texturePos: usize
 }
 impl stats {
-    fn new(health: f32) -> stats {stats{health, maxHealth: health, stamina:10.0, maxStamina:10.0, mana:10.0, maxMana:10.0, texturePos: 1}}
+    fn new(health: f32, damage: f32) -> stats {stats{health, maxHealth: health, damage, stamina:10.0, maxStamina:10.0, mana:10.0, maxMana:10.0, texturePos: 1}}
     pub fn render(&self, renderer: &mut WindowCanvas) {
         let maxHealthRenderBox = FRect::new(
             104.0,
@@ -470,6 +471,7 @@ pub struct enemy {
     enemyLeft: Vec<FRect>,
     pub hitBox: FRect,
     pub health: f32,
+    pub damage: f32,
     pub(crate) lastPhaseChange: Instant,
     pub render: bool,
     pub timeSinceHit: Instant,
@@ -479,7 +481,7 @@ pub struct enemy {
     texturePos: usize
 }
 impl enemy {
-    pub fn new(x: f32, y: f32, enemyUp: Vec<FRect>, enemyDown: Vec<FRect>, enemyLeft: Vec<FRect>, enemyRight: Vec<FRect>, attacks: attacks, roamPattern: roamPattern, texturePos: usize) -> enemy {enemy{
+    pub fn new(x: f32, y: f32, enemyUp: Vec<FRect>, enemyDown: Vec<FRect>, enemyLeft: Vec<FRect>, enemyRight: Vec<FRect>, health: f32, damage: f32, attacks: attacks, roamPattern: roamPattern, texturePos: usize) -> enemy {enemy{
         x,
         y,
         direction: "up".to_string(),
@@ -489,7 +491,8 @@ impl enemy {
         enemyLeft,
         enemyRight,
         hitBox: FRect{x, y, w: 0.0, h: 0.0},
-        health: 4.0,
+        health,
+        damage,
         lastPhaseChange: Instant::now(),
         render: true,
         timeSinceHit: Instant::now(),

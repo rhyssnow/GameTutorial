@@ -4,6 +4,7 @@
 mod PixelEngine;
 
 use std::fs;
+use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
@@ -29,8 +30,8 @@ fn main() {
 
     let content = fs::read_to_string(&"src/Metadata/initialSave.json").unwrap();
     let data: Value = serde_json::from_str(&content).unwrap();
-    //let mut file = File::create("src/Metadata/save.json").unwrap();
-    //file.write_all(serde_json::to_string(&data).unwrap().as_bytes()).unwrap();
+    let mut file = File::create("src/Metadata/save.json").unwrap();
+    file.write_all(serde_json::to_string(&data).unwrap().as_bytes()).unwrap();
     while running {
         let mut textureVec = Vec::new();
 

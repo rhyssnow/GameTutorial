@@ -13,7 +13,7 @@ pub fn loadSaveFromJson () -> (mainCharacter, String, f32, f32) {
     let content = fs::read_to_string(&"src/Metadata/save.json").unwrap();
     let data: Value = serde_json::from_str(&content).unwrap();
 
-    let mainCharacter = mainCharacter::new(data["mainX"].as_f64().unwrap() as f32, data["mainY"].as_f64().unwrap() as f32, data["maxHealth"].as_f64().unwrap() as f32);
+    let mainCharacter = mainCharacter::new(data["mainX"].as_f64().unwrap() as f32, data["mainY"].as_f64().unwrap() as f32, data["maxHealth"].as_f64().unwrap() as f32, data["damage"].as_f64().unwrap() as f32);
     let path = data["currentArea"].as_str().unwrap();
 
     (mainCharacter, path.to_string(), data["x"].as_f64().unwrap() as f32, data["y"].as_f64().unwrap() as f32)
@@ -111,6 +111,8 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                 down,
                 left,
                 right,
+                enemyType["health"].as_f64().unwrap() as f32,
+                enemyType["damage"].as_f64().unwrap() as f32,
                 attacks::new(enemyType["attackType"].as_str().unwrap().to_string()),
                 roamPattern::new(enemyType["roamType"].as_str().unwrap().to_string(), roamArea),
                 texturePos.clone()

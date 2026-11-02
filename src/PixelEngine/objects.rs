@@ -53,6 +53,7 @@ fn litBeaconInput (areaOfEffect: FRect, mainCharacter: &mainCharacter, window: &
 
         data["currentArea"] = json!(currentLocation);
         data["maxHealth"] = json!(mainCharacter.stats.maxHealth);
+        data["damage"] = json!(mainCharacter.stats.damage);
         data["x"] = json!(meshBox.x);
         data["y"] = json!(meshBox.y);
         data["mainX"] = json!(mainCharacter.x);

@@ -1,6 +1,7 @@
 use std::time::Instant;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use crate::PixelEngine::basic::{ mainCharacter, meshBox};
+use crate::PixelEngine::hitboxDetector;
 
 pub struct boss {
     x: f32,
@@ -70,14 +71,17 @@ impl boss {
         renderer.copy(&textureVec[self.texturePos], rectSet[self.walkingPhase], self.hitbox).unwrap();
     }
     pub fn update(&mut self, mainCharacter: &mut mainCharacter) {
-        if self.timeSinceHit.elapsed().as_millis() <= 250 {
-            self.render = !self.render;
+        if !self.activated {
+            match self.boss.as_str() {
+                "protectorKnight" => protectorKnightUnactivated(self, mainCharacter),
+                _ => {}
+            }
         }
         else {
-            self.render = true;
-        }
-        match self.boss {
-            _ => {}
+            match self.boss.as_str() {
+                "protectorKnight" => protectorKnightActivated(self),
+                _ => {}
+            }
         }
     }
     pub fn updatePosition(&mut self, x: f32, y: f32, backgroundTexture: &Texture) {
@@ -96,5 +100,19 @@ impl boss {
         if self.y + self.hitbox.h > backgroundTexture.height() as f32 * 6.0 {
             self.y = backgroundTexture.height() as f32 - self.hitbox.h;
         }
+    }
+}
+
+fn protectorKnightUnactivated (boss: &mut boss, mainCharacter: &mut mainCharacter) {
+    if hitboxDetector(boss.hitbox, mainCharacter.hitBox) {
+        boss.activated == true;
+    }
+}
+fn protectorKnightActivated (boss: &mut boss) {
+    if boss.timeSinceHit.elapsed().as_millis() <= 250 {
+        boss.render = !boss.render;
+    }
+    else {
+        boss.render = true;
     }
 }

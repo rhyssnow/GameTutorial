@@ -226,7 +226,7 @@ impl pixelEngine {
             );
             if hitboxDetector(enemyUsedHitbox, self.mainCharacter.hitBox) && !self.mainCharacter.immune {
                 self.mainCharacter.timeSinceHit = Instant::now();
-                self.mainCharacter.stats.health -= 2.0;
+                self.mainCharacter.stats.health -= enemy.damage;
                 self.mainCharacter.immune = true;
                 let speed = 20.0;
 
@@ -250,7 +250,7 @@ impl pixelEngine {
 
                 let m = movementCalculator(dx, dy, speed);
 
-                enemy.health -= 0.1;
+                enemy.health -= self.mainCharacter.stats.damage;
                 enemy.updatePosition(-m.0, -m.1, &textureVec[self.meshBox.texturePos]);
                 enemy.timeSinceHit = Instant::now();
             }
@@ -274,6 +274,9 @@ impl pixelEngine {
         }
         for hazard in self.hazards.iter_mut() {
             hazard.update(&mut self.mainCharacter, &mut self.enemies, &mut self.meshBox, &mut self.alive, textureVec);
+        }
+        for boss in self.bosses.iter_mut() {
+            boss.update(&mut self.mainCharacter);
         }
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {
