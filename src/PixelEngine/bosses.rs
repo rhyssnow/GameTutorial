@@ -104,8 +104,8 @@ impl boss {
 }
 
 fn protectorKnightUnactivated (boss: &mut boss, mainCharacter: &mut mainCharacter) {
-    if hitboxDetector(boss.hitbox, mainCharacter.hitBox) {
-        boss.activated == true;
+    if hitboxDetector(boss.triggerArea, mainCharacter.hitBox) {
+        boss.activated = true;
     }
 }
 fn protectorKnightActivated (boss: &mut boss) {
