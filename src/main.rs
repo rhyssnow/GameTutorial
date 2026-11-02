@@ -28,10 +28,10 @@ fn main() {
     renderer.clear();
     renderer.present();
 
-    //let content = fs::read_to_string(&"src/Metadata/initialSave.json").unwrap();
-    //let data: Value = serde_json::from_str(&content).unwrap();
-    //let mut file = File::create("src/Metadata/save.json").unwrap();
-    //file.write_all(serde_json::to_string(&data).unwrap().as_bytes()).unwrap();
+    let content = fs::read_to_string(&"src/Metadata/initialSave.json").unwrap();
+    let data: Value = serde_json::from_str(&content).unwrap();
+    let mut file = File::create("src/Metadata/save.json").unwrap();
+    file.write_all(serde_json::to_string(&data).unwrap().as_bytes()).unwrap();
     while running {
         let mut textureVec = Vec::new();
 
