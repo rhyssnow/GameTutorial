@@ -366,7 +366,7 @@ impl swordAttack{
         swingCooldown: Instant::now(),
         texturePos: 2,
     }}
-    pub fn render (&mut self, renderer: &mut WindowCanvas, characterX: f32, characterY: f32, textureVec: &Vec<Texture>) {
+    pub fn render (&mut self, renderer: &mut WindowCanvas, characterHitbox: FRect, textureVec: &Vec<Texture>) {
         if self.swingPhase == 6 {
             self.hitBox.w = 0.0;
             self.hitBox.h = 0.0;
@@ -376,62 +376,62 @@ impl swordAttack{
         }
         let renderX:f32 = match self.direction.as_str() {
             "up" => match self.swingPhase as f32 {
-                0.0 | 1.0 | 2.0 => characterX - 19.5 * 7.0 + 35.0,
-                3.0 => characterX - 17.5 * 7.0 + 35.0,
-                4.0 => characterX - 14.5 * 7.0 + 35.0,
-                5.0 => characterX - 11.5 * 7.0 + 35.0,
+                0.0 | 1.0 | 2.0 => characterHitbox.x - 19.5 * 7.0 + characterHitbox.w/2.0,
+                3.0 => characterHitbox.x - 17.5 * 7.0 + characterHitbox.w/2.0,
+                4.0 => characterHitbox.x - 14.5 * 7.0 + characterHitbox.w/2.0,
+                5.0 => characterHitbox.x - 11.5 * 7.0 + characterHitbox.w/2.0,
                 _ => 0.0,
             }
             "down" => match self.swingPhase as f32 {
-                0.0 => characterX + 16.5 * 7.0 + 35.0,
-                1.0 => characterX + 6.5 * 7.0 + 35.0,
-                2.0 => characterX + -5.5 * 7.0 + 35.0,
-                3.0 => characterX + -11.5 * 7.0 + 35.0,
-                4.0 => characterX + -16.5 * 7.0 + 35.0,
-                5.0 => characterX + -18.5 * 7.0 + 35.0,
+                0.0 => characterHitbox.x + 16.5 * 7.0 + characterHitbox.w/2.0,
+                1.0 => characterHitbox.x + 6.5 * 7.0 + characterHitbox.w/2.0,
+                2.0 => characterHitbox.x + -5.5 * 7.0 + characterHitbox.w/2.0,
+                3.0 => characterHitbox.x + -11.5 * 7.0 + characterHitbox.w/2.0,
+                4.0 => characterHitbox.x + -16.5 * 7.0 + characterHitbox.w/2.0,
+                5.0 => characterHitbox.x + -18.5 * 7.0 + characterHitbox.w/2.0,
                 _ => 0.0,
             },
             "left" => match self.swingPhase as f32 {
-                0.0 => characterX - 3.0 * 7.9 - 30.0,
-                1.0  => characterX - 11.0 * 7.0 - 30.0,
-                2.0 |3.0 |4.0 | 5.0 => characterX - 12.0 * 7.0 - 30.0,
+                0.0 => characterHitbox.x - 3.0 * 7.9 - characterHitbox.h /2.5,
+                1.0  => characterHitbox.x - 11.0 * 7.0 - characterHitbox.h /2.5,
+                2.0 |3.0 |4.0 | 5.0 => characterHitbox.x - 12.0 * 7.0 - characterHitbox.h /2.5,
 
                 _ => 0.0,
             },
             "right" => match self.swingPhase as f32 {
-                0.0 | 1.0 | 2.0  => characterX + 90.0,
-                3.0 => characterX + 1.0 * 7.0 + 100.0,
-                4.0 => characterX + 2.0 * 7.0 + 100.0,
-                5.0 => characterX - 2.0 * 7.0 + 100.0,
+                0.0 | 1.0 | 2.0  => characterHitbox.x + characterHitbox.h/2.5 + characterHitbox.w,
+                3.0 => characterHitbox.x + 1.0 * 7.0 + characterHitbox.h/2.5 + characterHitbox.w,
+                4.0 => characterHitbox.x + 2.0 * 7.0 + characterHitbox.h/2.5 + characterHitbox.w,
+                5.0 => characterHitbox.x - 2.0 * 7.0 + characterHitbox.h/2.5 + characterHitbox.w,
                 _ => 0.0,
             },
             _ => 0.0,
         };
         let renderY:f32 = match self.direction.as_str() {
             "up" => match self.swingPhase as f32 {
-                0.0 => characterY,
-                1.0 => characterY - 8.0 * 7.0,
-                2.0 | 3.0 | 4.0 | 5.0 => characterY - 10.0 * 7.0,
+                0.0 => characterHitbox.y - 3.0 * 7.0,
+                1.0 => characterHitbox.y - 11.0 * 7.0,
+                2.0 | 3.0 | 4.0 | 5.0 => characterHitbox.y - 13.0 * 7.0,
                 _ => 0.0
             }
             "down" => match self.swingPhase as f32 {
-                0.0 | 1.0 | 2.0 | 5.0 => characterY + 95.0,
-                3.0 |4.0 => characterY + 109.0,
+                0.0 | 1.0 | 2.0 | 5.0 => characterHitbox.y + characterHitbox.h,
+                3.0 |4.0 => characterHitbox.y + 7.0 * 2.0 + characterHitbox.h,
                 _ => 0.0
             }
             "left" => match self.swingPhase as f32 {
-                0.0 => characterY - 3.0 * 7.0 + 140.0,
-                1.0 => characterY - 10.0 * 7.0 + 140.0,
-                2.0 => characterY - 16.0 * 7.0 + 140.0,
-                3.0 => characterY - 22.0 * 7.0 + 140.0,
-                4.0 => characterY - 25.0 * 7.0 + 140.0,
-                5.0 => characterY - 26.0 * 7.0 + 140.0,
+                0.0 => characterHitbox.y + 9.0 * 7.0 + characterHitbox.h/2.0,
+                1.0 => characterHitbox.y + 2.0 * 7.0 + characterHitbox.h/2.0,
+                2.0 => characterHitbox.y - 4.0 * 7.0 + characterHitbox.h/2.0,
+                3.0 => characterHitbox.y - 10.0 * 7.0 + characterHitbox.h/2.0,
+                4.0 => characterHitbox.y - 13.0 * 7.0 + characterHitbox.h/2.0,
+                5.0 => characterHitbox.y - 14.0 * 7.0 + characterHitbox.h/2.0,
                 _ => 0.0
             }
             "right" => match self.swingPhase as f32 {
-                0.0 | 1.0 | 2.0 | 3.0 => characterY - 35.0,
-                4.0 => characterY + 3.0 * 7.0 - 35.0,
-                5.0 => characterY + 5.0 * 7.0 - 35.0,
+                0.0 | 1.0 | 2.0 | 3.0 => characterHitbox.y - 14.0 * 7.0 + characterHitbox.h/2.0,
+                4.0 => characterHitbox.y - 11.0 * 7.0 + characterHitbox.h/2.0,
+                5.0 => characterHitbox.y - 9.0 * 7.0 + characterHitbox.h/2.0,
                 _ => 0.0,
             }
             _ => 0.0,

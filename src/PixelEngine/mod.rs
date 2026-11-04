@@ -257,7 +257,7 @@ impl pixelEngine {
         for boss in self.bosses.iter_mut() {
             boss.update(&mut self.mainCharacter, &mut self.meshBox, textureVec, window, &mut self.alive);
         }
-        
+
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {
             if self.enemies[enemy].health < 0.0 {
@@ -268,7 +268,7 @@ impl pixelEngine {
         for enemy in removeEnemy {
             self.enemies.remove(enemy);
         }
-        
+
         let mut removeBoss = Vec::new();
         for boss in 0..self.bosses.len() {
             if self.bosses[boss].dead {
@@ -316,7 +316,7 @@ impl pixelEngine {
             }
         }
 
-        self.mainCharacter.swordAttack.render(renderer, self.mainCharacter.x, self.mainCharacter.y, textureVec);
+        self.mainCharacter.swordAttack.render(renderer, self.mainCharacter.hitBox, textureVec);
         self.meshBox.renderForeground(textureVec, renderer, backgroundRenderArea);
         self.mainCharacter.stats.render(renderer);
 

@@ -86,7 +86,7 @@ impl boss {
 
         renderer.copy(&textureVec[self.texturePos], rectSet[self.walkingPhase], self.hitbox).unwrap();
 
-        self.sword.render(renderer, self.hitbox.x, self.hitbox.y, textureVec)
+        self.sword.render(renderer, self.hitbox, textureVec)
     }
     pub fn update(&mut self, mainCharacter: &mut mainCharacter, meshBox: &mut meshBox, textureVec: &Vec<Texture>, window: &Window, alive: &mut bool) {
         if !self.activated {
