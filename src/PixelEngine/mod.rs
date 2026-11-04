@@ -218,28 +218,7 @@ impl pixelEngine {
     pub fn update(&mut self, mut textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool, parentFunc: &mut bool) {
         self.mainCharacter.update();
         for mut enemy in self.enemies.iter_mut() {
-            let enemyUsedHitbox = FRect::new(
-                enemy.hitBox.x + enemy.hitBox.w * 0.1,
-                enemy.hitBox.y + enemy.hitBox.h * 0.1,
-                enemy.hitBox.w * 0.8,
-                enemy.hitBox.h * 0.8
-            );
-            if hitboxDetector(enemyUsedHitbox, self.mainCharacter.hitBox) && !self.mainCharacter.immune {
-                self.mainCharacter.timeSinceHit = Instant::now();
-                self.mainCharacter.stats.health -= enemy.damage;
-                self.mainCharacter.immune = true;
-                let speed = 20.0;
-
-                let dx = self.mainCharacter.x - enemyUsedHitbox.x;
-                let dy = self.mainCharacter.y - enemyUsedHitbox.y;
-
-                let m = movementCalculator(dx, dy, speed);
-
-                self.mainCharacter.updatePosition(m.0, m.1, window);
-                if self.mainCharacter.stats.health <= 0.0 {
-                    self.alive = false;
-                }
-            }
+            damageMaincharacter(&mut self.mainCharacter, window, enemy.hitBox, enemy.damage, &mut self.alive);
             if hitboxDetector(enemy.hitBox, self.mainCharacter.swordAttack.hitBox) {
                 let speed = 1.0;
                 let mainPosX = self.mainCharacter.x + self.meshBox.x * 6.0;
@@ -276,8 +255,9 @@ impl pixelEngine {
             hazard.update(&mut self.mainCharacter, &mut self.enemies, &mut self.meshBox, &mut self.alive, textureVec);
         }
         for boss in self.bosses.iter_mut() {
-            boss.update(&mut self.mainCharacter);
+            boss.update(&mut self.mainCharacter, &mut self.meshBox, textureVec, window, &mut self.alive);
         }
+        
         let mut removeEnemy = Vec::new();
         for enemy in 0..self.enemies.len() {
             if self.enemies[enemy].health < 0.0 {
@@ -287,6 +267,17 @@ impl pixelEngine {
         removeEnemy.sort_by(|a, b| b.cmp(a));
         for enemy in removeEnemy {
             self.enemies.remove(enemy);
+        }
+        
+        let mut removeBoss = Vec::new();
+        for boss in 0..self.bosses.len() {
+            if self.bosses[boss].dead {
+                removeBoss.push(boss);
+            }
+        }
+        removeBoss.sort_by(|a, b| b.cmp(a));
+        for boss in removeBoss {
+            self.bosses.remove(boss);
         }
     }
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, window: &Window) {
@@ -386,4 +377,37 @@ fn movementCalculator(dx: f32, dy: f32, speed: f32) -> (f32, f32) {
         my = -my;
     }
     (mx, my)
+}
+
+fn asPositive(x: f32) -> f32 {
+    let mut returnVal = x;
+    if returnVal.is_sign_negative() {
+        returnVal = -returnVal;
+    }
+    returnVal
+}
+
+fn damageMaincharacter (mainCharacter: &mut mainCharacter, window: &Window, enemyHitbox: FRect, damage: f32, alive: &mut bool) {
+    let enemyUsedHitbox = FRect::new(
+        enemyHitbox.x + enemyHitbox.w * 0.1,
+        enemyHitbox.y + enemyHitbox.h * 0.1,
+        enemyHitbox.w * 0.8,
+        enemyHitbox.h * 0.8
+    );
+    if hitboxDetector(enemyUsedHitbox, mainCharacter.hitBox) && !mainCharacter.immune {
+        mainCharacter.timeSinceHit = Instant::now();
+        mainCharacter.stats.health -= damage;
+        mainCharacter.immune = true;
+        let speed = 20.0;
+
+        let dx = mainCharacter.x - enemyUsedHitbox.x;
+        let dy = mainCharacter.y - enemyUsedHitbox.y;
+
+        let m = movementCalculator(dx, dy, speed);
+
+        mainCharacter.updatePosition(m.0, m.1, window);
+        if mainCharacter.stats.health <= 0.0 {
+            *alive = false;
+        }
+    }
 }

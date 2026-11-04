@@ -1,6 +1,6 @@
 {
   "wolfMissile": [
-    { "roamType" : "squareRoam", "attackType" : "missile", "health":  4.0, "damage": 2.2, "up" : [
+    { "roamType" : "squareRoam", "attackType" : "missile", "health":  4.0, "damage": 2.5, "up" : [
         {"x" : 17.0, "y" : 29.0, "w" : 14.0, "h" : 27.0},
         {"x" : 32.0, "y" : 29.0, "w" : 14.0, "h" : 27.0}
       ], "down" : [
@@ -16,7 +16,7 @@
     }
   ],
   "wolfPace": [
-    { "roamType" : "squarePace", "attackType" : "none", "health":  4.0, "damage": 2.0,  "up" : [
+    { "roamType" : "squarePace", "attackType" : "none", "health":  4.0, "damage": 2.2,  "up" : [
       {"x" : 17.0, "y" : 29.0, "w" : 14.0, "h" : 27.0},
       {"x" : 32.0, "y" : 29.0, "w" : 14.0, "h" : 27.0}
     ], "down" : [

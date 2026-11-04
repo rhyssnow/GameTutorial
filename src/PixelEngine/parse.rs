@@ -166,7 +166,7 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                 frect["h"].as_f64().unwrap() as f32,
             ))
         }
-        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["up"].as_array().unwrap() {
+        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["down"].as_array().unwrap() {
             down.push(FRect::new(
                 frect["x"].as_f64().unwrap() as f32,
                 frect["y"].as_f64().unwrap() as f32,
@@ -174,7 +174,7 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                 frect["h"].as_f64().unwrap() as f32,
             ))
         }
-        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["up"].as_array().unwrap() {
+        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["left"].as_array().unwrap() {
             left.push(FRect::new(
                 frect["x"].as_f64().unwrap() as f32,
                 frect["y"].as_f64().unwrap() as f32,
@@ -182,7 +182,7 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                 frect["h"].as_f64().unwrap() as f32,
             ))
         }
-        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["up"].as_array().unwrap() {
+        for frect in bossData[boss["boss"].as_str().unwrap().to_string()]["right"].as_array().unwrap() {
             right.push(FRect::new(
                 frect["x"].as_f64().unwrap() as f32,
                 frect["y"].as_f64().unwrap() as f32,
@@ -190,7 +190,6 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                 frect["h"].as_f64().unwrap() as f32,
             ))
         }
-
 
         bosses.push(boss::new(
             boss["boss"].as_str().unwrap().to_string(),
@@ -204,10 +203,12 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
             down,
             left,
             right,
-            texturePos
+            bossData[boss["boss"].as_str().unwrap().to_string()]["damage"].as_f64().unwrap() as f32,
+            bossData[boss["boss"].as_str().unwrap().to_string()]["health"].as_f64().unwrap() as f32,
+            texturePos,
         ));
         textureVec.push("src/Assets/".to_string() + bossData[boss["boss"].as_str().unwrap().to_string()]["textureFile"].as_str().unwrap());
         texturePos += 1;
     }
-    (textureVec, meshBox, enemies, triggerVec, hazardVec, objectVec, bosses) //the meshbox needs its width, height and x, y coordinates set before it is usable.
+    (textureVec, meshBox, enemies, triggerVec, hazardVec, objectVec, bosses)
 }
