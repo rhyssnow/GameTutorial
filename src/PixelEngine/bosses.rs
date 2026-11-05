@@ -207,8 +207,11 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
 
             let mut number = 0;
             if boss.time.elapsed().as_millis() > 1000 {
-                number = rand::random_range(0..3);
+                number = rand::random_range(0..4);
                 boss.time = Instant::now();
+                if (dx*dx + dy*dy).sqrt() > 1000.0 {
+                    number = 3;
+                }
             }
             number
         },
@@ -280,7 +283,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
 
                     boss.updatePosition(m.0, m.1, backgroundTexture);
 
-                    damageMaincharacter(mainCharacter, window, boss.hitbox, boss.damage * 1.75, alive);
+                    damageMaincharacter(mainCharacter, window, boss.hitbox, boss.damage * 2.0, alive);
                 }
                 else {
                     let speed = 25.0;
@@ -334,7 +337,59 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
         3 => {
             let mut number = 3;
 
+            if boss.bool {
+                if (dx * dx + dy * dy).sqrt() < 200.0 && !boss.bool2{
+                    boss.sword.swingPhase = 0;
+                    boss.sword.swingPhaseFloat = 0.0;
+                    boss.sword.direction = boss.direction.clone();
+                    boss.bool2 = true;                }
+                if boss.bool2 {
+                    if boss.sword.swingPhase == 6 {
+                        number = 0;
+                        boss.bool = false;
+                        boss.bool2 = false;
+                        boss.time = Instant::now();
+                    }
+                    else {
+                        damageMaincharacter(mainCharacter, window, boss.sword.hitBox, boss.damage * 1.25, alive);
+                    }
+                }
+                else {
+                    let speed = 2.5;
 
+                    let m = movementCalculator(dx, dy, speed);
+                    let mut vertical = true;
+                    if asPositive(m.0) > asPositive(m.1) {
+                        vertical = false;
+                    }
+                    if vertical == true {
+                        if m.1 > 0.0 {
+                            boss.direction = String::from("down");
+                        }
+                        else {
+                            boss.direction = String::from("up");
+                        }
+                    }
+                    else {
+                        if m.0 > 0.0 {
+                            boss.direction = String::from("right");
+                        }
+                        else {
+                            boss.direction = String::from("left");
+                        }
+                    }
+
+                    boss.updatePosition(m.0, m.1, backgroundTexture);
+                }
+            }
+            if !boss.bool {
+                if (dx * dx + dy * dy).sqrt() > 550.0 {
+                    boss.bool = true;
+                    boss.bool2 = false;
+                } else {
+                    number = 0;
+                }
+            }
 
             number
         }
