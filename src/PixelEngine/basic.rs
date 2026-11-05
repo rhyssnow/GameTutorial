@@ -542,10 +542,10 @@ impl enemy {
         if self.y < 0.0 {
             self.y = 0.0;
         }
-        if self.x + self.hitBox.w > backgroundTexture.width() as f32 * 6.0 {
+        if self.x + self.hitBox.w > backgroundTexture.width() as f32 {
             self.x = backgroundTexture.width() as f32 - self.hitBox.w;
         }
-        if self.y + self.hitBox.h > backgroundTexture.height() as f32 * 6.0 {
+        if self.y + self.hitBox.h > backgroundTexture.height() as f32 {
             self.y = backgroundTexture.height() as f32 - self.hitBox.h;
         }
     }

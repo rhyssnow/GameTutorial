@@ -31,6 +31,8 @@ pub struct boss {
     time: Instant,
     bool: bool,
     bool2: bool,
+    float: f32,
+    float2: f32
 }
 
 impl boss {
@@ -60,6 +62,8 @@ impl boss {
         time: Instant::now(),
         bool: false,
         bool2: false,
+        float: 0.0,
+        float2: 0.0
     }}
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, meshBox: &mut meshBox) {
         if !self.render{
@@ -114,10 +118,10 @@ impl boss {
         if self.y < 0.0 {
             self.y = 0.0;
         }
-        if self.x + self.hitbox.w > backgroundTexture.width() as f32 * 6.0 {
+        if self.x + self.hitbox.w > backgroundTexture.width() as f32 {
             self.x = backgroundTexture.width() as f32 - self.hitbox.w;
         }
-        if self.y + self.hitbox.h > backgroundTexture.height() as f32 * 6.0 {
+        if self.y + self.hitbox.h > backgroundTexture.height() as f32{
             self.y = backgroundTexture.height() as f32 - self.hitbox.h;
         }
     }
@@ -154,8 +158,6 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
 
     let dx = mainPosX - boss.x * 6.0;
     let dy = mainPosY - boss.y * 6.0;
-
-    damageMaincharacter(mainCharacter, window, boss.hitbox, boss.damage, alive);
 
     if hitboxDetector(boss.hitbox, mainCharacter.swordAttack.hitBox) {
         let speed = 0.5;
@@ -205,7 +207,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
 
             let mut number = 0;
             if boss.time.elapsed().as_millis() > 1000 {
-                number = rand::random_range(0..2);
+                number = rand::random_range(0..3);
                 boss.time = Instant::now();
             }
             number
@@ -216,12 +218,13 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                 if boss.sword.swingPhase == 6 && boss.bool2 {
                     number = 0;
                     boss.bool = false;
+                    boss.bool2 = false;
                     boss.time = Instant::now();
                 } else if boss.bool2{
                     damageMaincharacter(mainCharacter, window, boss.sword.hitBox, boss.damage * 1.25, alive);
                 }
                 else {
-                    if boss.sword.swingCooldown.elapsed().as_millis() > 450 {
+                    if boss.sword.swingCooldown.elapsed().as_millis() > 400 {
                         boss.sword.swingPhase = 0;
                         boss.sword.swingPhaseFloat = 0.0;
                         boss.sword.direction = boss.direction.clone();
@@ -230,7 +233,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                 }
             }
             if !boss.bool {
-                 if (dx * dx + dy * dy).sqrt() < 250.0 && boss.sword.swingPhase == 6 {
+                 if (dx * dx + dy * dy).sqrt() < 300.0 && boss.sword.swingPhase == 6 {
                     boss.sword.swingCooldown = Instant::now();
                     boss.bool = true;
                      boss.bool2 = false;
@@ -238,9 +241,104 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                     number = 0;
                 }
             }
+            number
+        }
+        2 => {
+            let mut number = 2;
+
+            if boss.bool {
+                if boss.sword.swingCooldown.elapsed().as_millis() < 700 && boss.bool2 {
+                    boss.sword.swingPhase = 0;
+                    boss.sword.swingPhaseFloat = 0.0;
+                    boss.sword.direction = boss.direction.clone();
+                    boss.float = dx;
+                    boss.float2 = dy;
+                } else if boss.bool2{
+                    let speed = 10.0;
+
+                    let m = movementCalculator(boss.float, boss.float2, speed);
+                    let mut vertical = true;
+                    if asPositive(m.0) > asPositive(m.1) {
+                        vertical = false;
+                    }
+                    if vertical == true {
+                        if m.1 > 0.0 {
+                            boss.direction = String::from("down");
+                        }
+                        else {
+                            boss.direction = String::from("up");
+                        }
+                    }
+                    else {
+                        if m.0 > 0.0 {
+                            boss.direction = String::from("right");
+                        }
+                        else {
+                            boss.direction = String::from("left");
+                        }
+                    }
+
+                    boss.updatePosition(m.0, m.1, backgroundTexture);
+
+                    damageMaincharacter(mainCharacter, window, boss.hitbox, boss.damage * 1.75, alive);
+                }
+                else {
+                    let speed = 25.0;
+
+                    let m = movementCalculator(dx, dy, speed);
+                    let mut vertical = true;
+                    if asPositive(m.0) > asPositive(m.1) {
+                        vertical = false;
+                    }
+                    if vertical == true {
+                        if m.1 > 0.0 {
+                            boss.direction = String::from("down");
+                        }
+                        else {
+                            boss.direction = String::from("up");
+                        }
+                    }
+                    else {
+                        if m.0 > 0.0 {
+                            boss.direction = String::from("right");
+                        }
+                        else {
+                            boss.direction = String::from("left");
+                        }
+                    }
+
+                    boss.updatePosition(-m.0, -m.1, backgroundTexture);
+                    if (dx*dx + dy*dy).sqrt() >= 600.0 {
+                        boss.bool2 = true;
+                    }
+                }
+            }
+            if !boss.bool {
+                if (dx * dx + dy * dy).sqrt() < 500.0 && (dx * dx + dy * dy).sqrt() > 100.0 && boss.sword.swingPhase == 6 {
+                    boss.sword.swingCooldown = Instant::now();
+                    boss.bool = true;
+                    boss.bool2 = false;
+                } else {
+                    number = 0;
+                }
+            }
+            if boss.sword.swingCooldown.elapsed().as_millis() > 1500 && boss.bool {
+                boss.bool2 = false;
+                boss.bool = false;
+                number = 0;
+                boss.time = Instant::now();
+            }
+
+            number
+        }
+        3 => {
+            let mut number = 3;
+
+
 
             number
         }
         _ => 0
-    }
+    };
+    damageMaincharacter(mainCharacter, window, boss.hitbox, boss.damage, alive);
 }

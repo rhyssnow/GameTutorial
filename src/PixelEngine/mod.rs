@@ -299,20 +299,22 @@ impl pixelEngine {
         }
         for boss in 0.. self.bosses.len() {
             if self.bosses[boss].render {
-                renderThings.push((boss, self.bosses[boss].y + self.bosses[boss].hitbox.h /12.0, 2));
+                renderThings.push((boss, self.bosses[boss].y + self.bosses[boss].hitbox.h /1.0, 2));
             }
         }
         for object in 0..self.objects.len() {
             renderThings.push((object, self.objects[object].area.y + self.objects[object].area.h, 3));
         }
-        renderThings.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
-        for thing in renderThings {
-            match thing.2 {
-                0 => self.mainCharacter.render(textureVec,renderer),
-                1 => self.enemies[thing.0].render(textureVec, renderer, &mut self.meshBox),
-                2 => self.bosses[thing.0].render(textureVec, renderer, &mut self.meshBox),
-                3 => self.objects[thing.0].render(renderer, &self.meshBox, textureVec, window),
-                _ => {}
+        if renderThings.len() > 0 {
+            renderThings.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+            for thing in renderThings {
+                match thing.2 {
+                    0 => self.mainCharacter.render(textureVec, renderer),
+                    1 => self.enemies[thing.0].render(textureVec, renderer, &mut self.meshBox),
+                    2 => self.bosses[thing.0].render(textureVec, renderer, &mut self.meshBox),
+                    3 => self.objects[thing.0].render(renderer, &self.meshBox, textureVec, window),
+                    _ => {}
+                }
             }
         }
 
