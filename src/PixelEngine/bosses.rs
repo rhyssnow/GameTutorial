@@ -29,7 +29,8 @@ pub struct boss {
     sword: swordAttack,
     mode: i32,
     time: Instant,
-    bool: bool
+    bool: bool,
+    bool2: bool,
 }
 
 impl boss {
@@ -57,7 +58,8 @@ impl boss {
         sword: swordAttack::new("up".to_string()),
         mode: 0,
         time: Instant::now(),
-        bool: false
+        bool: false,
+        bool2: false,
     }}
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, meshBox: &mut meshBox) {
         if !self.render{
@@ -202,7 +204,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
             boss.updatePosition(m.0, m.1, backgroundTexture);
 
             let mut number = 0;
-            if boss.time.elapsed().as_millis() > 750 {
+            if boss.time.elapsed().as_millis() > 1000 {
                 number = rand::random_range(0..2);
                 boss.time = Instant::now();
             }
@@ -210,19 +212,31 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
         },
         1 => {
             let mut number = 1;
-            if boss.sword.swingPhase == 6 && boss.bool == true {
-                number = number + 1;
-                if number > 3 {
-                    number = 1;
+            if boss.bool {
+                if boss.sword.swingPhase == 6 && boss.bool2 {
+                    number = 0;
+                    boss.bool = false;
+                    boss.time = Instant::now();
+                } else if boss.bool2{
+                    damageMaincharacter(mainCharacter, window, boss.sword.hitBox, boss.damage * 1.25, alive);
                 }
-                boss.bool = false;
+                else {
+                    if boss.sword.swingCooldown.elapsed().as_millis() > 450 {
+                        boss.sword.swingPhase = 0;
+                        boss.sword.swingPhaseFloat = 0.0;
+                        boss.sword.direction = boss.direction.clone();
+                        boss.bool2 = true;
+                    }
+                }
             }
-            if (dx * dx + dy * dy).sqrt() < 200.0 && boss.sword.swingPhase == 6 && boss.bool == false {
-                boss.sword.swingPhase = 0;
-                boss.sword.swingPhaseFloat = 0.0;
-                boss.sword.direction = boss.direction.clone();
-                boss.sword.swingCooldown = Instant::now();
-                boss.bool = true;
+            if !boss.bool {
+                 if (dx * dx + dy * dy).sqrt() < 250.0 && boss.sword.swingPhase == 6 {
+                    boss.sword.swingCooldown = Instant::now();
+                    boss.bool = true;
+                     boss.bool2 = false;
+                } else {
+                    number = 0;
+                }
             }
 
             number
