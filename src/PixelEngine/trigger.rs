@@ -125,10 +125,10 @@ fn loadNewArea (file: String, area: FRect, meshBox: &meshBox, renderer: &mut Win
         let startX: f32;
         if area.x > textureVec[3].width() as f32 - 10.0 {
             startX = 0.0;
-            mainCharacter.x = -40.0;
+            mainCharacter.x = -12.0;
         } else if area.x < 10.0 {
             startX = -1.0;
-            mainCharacter.x = window.size_in_pixels().0 as f32 - mainCharacter.hitBox.w + 40.0;
+            mainCharacter.x = window.size_in_pixels().0 as f32 - mainCharacter.hitBox.w + 12.0;
         } else {
             startX = meshBox.x;
         }

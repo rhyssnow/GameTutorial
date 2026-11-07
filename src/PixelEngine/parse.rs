@@ -208,6 +208,7 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
             texturePos,
         ));
         textureVec.push("src/Assets/".to_string() + bossData[boss["boss"].as_str().unwrap().to_string()]["textureFile"].as_str().unwrap());
+        textureVec.push("src/Assets/".to_string() + bossData[boss["boss"].as_str().unwrap().to_string()]["swordFile"].as_str().unwrap());
         texturePos += 1;
     }
     (textureVec, meshBox, enemies, triggerVec, hazardVec, objectVec, bosses)

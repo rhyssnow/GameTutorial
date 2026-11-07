@@ -57,7 +57,7 @@ impl boss {
         alive: true,
         dead: false,
         texturePos,
-        sword: swordAttack::new("up".to_string()),
+        sword: swordAttack::new("up".to_string(), texturePos+1),
         mode: 0,
         time: Instant::now(),
         bool: false,
@@ -103,7 +103,7 @@ impl boss {
         }
         else {
             match self.boss.as_str() {
-                "protectorKnight" => protectorKnightActivated(self, mainCharacter, meshBox, &textureVec[4], window, alive),
+                "protectorKnight" => protectorKnightActivated(self, mainCharacter, meshBox, &textureVec[meshBox.texturePos], window, alive),
                 _ => {}
             }
         }
@@ -118,10 +118,10 @@ impl boss {
         if self.y < 0.0 {
             self.y = 0.0;
         }
-        if self.x + self.hitbox.w > backgroundTexture.width() as f32 {
+        if self.x + self.hitbox.w / 6.0 > backgroundTexture.width() as f32 {
             self.x = backgroundTexture.width() as f32 - self.hitbox.w;
         }
-        if self.y + self.hitbox.h > backgroundTexture.height() as f32{
+        if self.y + self.hitbox.h / 6.0 > backgroundTexture.height() as f32{
             self.y = backgroundTexture.height() as f32 - self.hitbox.h;
         }
     }
@@ -209,7 +209,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
             if boss.time.elapsed().as_millis() > 1000 {
                 number = rand::random_range(0..4);
                 boss.time = Instant::now();
-                if (dx*dx + dy*dy).sqrt() > 1000.0 {
+                if (dx*dx + dy*dy).sqrt() > 600.0 {
                     number = 3;
                 }
             }
@@ -311,7 +311,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                     }
 
                     boss.updatePosition(-m.0, -m.1, backgroundTexture);
-                    if (dx*dx + dy*dy).sqrt() >= 600.0 {
+                    if (dx*dx + dy*dy).sqrt() >= 350.0 {
                         boss.bool2 = true;
                     }
                 }
@@ -325,7 +325,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                     number = 0;
                 }
             }
-            if boss.sword.swingCooldown.elapsed().as_millis() > 1500 && boss.bool {
+            if boss.sword.swingCooldown.elapsed().as_millis() > 1100 && boss.bool {
                 boss.bool2 = false;
                 boss.bool = false;
                 number = 0;
@@ -383,7 +383,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                 }
             }
             if !boss.bool {
-                if (dx * dx + dy * dy).sqrt() > 550.0 {
+                if (dx * dx + dy * dy).sqrt() > 350.0 {
                     boss.bool = true;
                     boss.bool2 = false;
                 } else {

@@ -146,7 +146,7 @@ impl mainCharacter {
         characterLeft: [FRect::new(1.0, 1.0, 10.0, 16.0), FRect::new(12.0, 1.0, 10.0, 16.0), FRect::new(23.0, 1.0, 10.0, 16.0)],
         hitBox: FRect{x, y, w: 70.0, h: 112.0},
         stats: stats::new(health, damage),
-        swordAttack: swordAttack::new("up".to_string()),
+        swordAttack: swordAttack::new("up".to_string(), 2),
         lastPhaseChange: Instant::now(),
         immune: false,
         render: true,
@@ -354,7 +354,7 @@ pub struct swordAttack {
 }
 
 impl swordAttack{
-    pub(crate) fn new(direction: String) -> swordAttack {swordAttack{
+    pub(crate) fn new(direction: String, texturePos: usize) -> swordAttack {swordAttack{
         swingUp: [FRect::new(1.0, 1.0, 3.0, 3.0), FRect::new(5.0, 1.0, 13.0, 11.0), FRect::new(19.0, 1.0, 25.0, 13.0), FRect::new(47.0, 1.0, 31.0, 11.0), FRect::new(79.0, 1.0, 33.0, 10.0), FRect::new(113.0, 1.0, 32.0, 14.0)],
         swingDown: [FRect::new(1.0, 16.0, 3.0, 3.0), FRect::new(5.0, 16.0, 13.0, 11.0), FRect::new(19.0, 16.0, 25.0, 13.0), FRect::new(47.0, 16.0, 31.0, 11.0), FRect::new(79.0, 16.0, 33.0, 11.0), FRect::new(113.0, 16.0, 32.0, 14.0)],
         swingLeft: [FRect::new(1.0, 30.0, 3.0, 2.0), FRect::new(5.0, 30.0, 12.0, 9.0), FRect::new(17.0, 30.0, 12.0, 15.0), FRect::new(30.0, 30.0, 11.0, 20.0), FRect::new(42.0, 30.0, 10.0, 21.0), FRect::new(53.0, 30.0, 14.0, 20.0)],
@@ -364,7 +364,7 @@ impl swordAttack{
         swingPhaseFloat: 6.0,
         direction,
         swingCooldown: Instant::now(),
-        texturePos: 2,
+        texturePos,
     }}
     pub fn render (&mut self, renderer: &mut WindowCanvas, characterHitbox: FRect, textureVec: &Vec<Texture>) {
         if self.swingPhase == 6 {
@@ -542,10 +542,10 @@ impl enemy {
         if self.y < 0.0 {
             self.y = 0.0;
         }
-        if self.x + self.hitBox.w > backgroundTexture.width() as f32 {
+        if self.x + self.hitBox.w / 6.0 > backgroundTexture.width() as f32 {
             self.x = backgroundTexture.width() as f32 - self.hitBox.w;
         }
-        if self.y + self.hitBox.h > backgroundTexture.height() as f32 {
+        if self.y + self.hitBox.h / 6.0 > backgroundTexture.height() as f32 {
             self.y = backgroundTexture.height() as f32 - self.hitBox.h;
         }
     }

@@ -9,6 +9,7 @@ pub mod basic;
 pub mod bosses;
 pub mod objects;
 
+use std::f32::NAN;
 use std::time::Instant;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::keyboard::Scancode;
@@ -299,7 +300,7 @@ impl pixelEngine {
         }
         for boss in 0.. self.bosses.len() {
             if self.bosses[boss].render {
-                renderThings.push((boss, self.bosses[boss].y + self.bosses[boss].hitbox.h /1.0, 2));
+                renderThings.push((boss, (self.bosses[boss].hitbox.y + self.meshBox.y * 6.0)+ self.bosses[boss].hitbox.h /1.0, 2));
             }
         }
         for object in 0..self.objects.len() {
