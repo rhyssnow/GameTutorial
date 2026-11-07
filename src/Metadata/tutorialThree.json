@@ -2,7 +2,7 @@
   "meshBox" : [
     {
       "background": "src/Assets/tutorialThree.png",
-      "foreground": "src/Assets/blank.png",
+      "foreground": "src/Assets/tutorialThreeForeground.png",
       "triggers": [
         {"triggerType":  "newAreatutorialTwo", "x": -3, "y": 747, "w": 0, "h": 170},
         {"triggerType":  "impassable", "x": 350, "y": 680, "w": 263, "h": 9},
@@ -25,7 +25,16 @@
         {"triggerType":  "impassable", "x": 365, "y": 751, "w": 9, "h": 24},
         {"triggerType":  "impassable", "x": 352, "y": 729, "w": 10, "h": 22},
         {"triggerType":  "impassable", "x": 349, "y": 707, "w": 10, "h": 22},
-        {"triggerType":  "impassable", "x": 343, "y": 688, "w": 12, "h": 20}
+        {"triggerType":  "impassable", "x": 343, "y": 688, "w": 12, "h": 20},
+        {"triggerType":  "impassable", "x": 630, "y": 894, "w": 27, "h": 25},
+        {"triggerType":  "impassable", "x": 627, "y": 868, "w": 27, "h": 26},
+        {"triggerType":  "impassable", "x": 624, "y": 843, "w": 27, "h": 25},
+        {"triggerType":  "impassable", "x": 621, "y": 819, "w": 27, "h": 24},
+        {"triggerType":  "impassable", "x": 618, "y": 795, "w": 27, "h": 24},
+        {"triggerType":  "impassable", "x": 615, "y": 771, "w": 27, "h": 24},
+        {"triggerType":  "impassable", "x": 612, "y": 747, "w": 27, "h": 24},
+        {"triggerType":  "impassable", "x": 609, "y": 725, "w": 27, "h": 22},
+        {"triggerType":  "impassable", "x": 605, "y": 679, "w": 29, "h": 46}
 
       ],
       "hazards": [
