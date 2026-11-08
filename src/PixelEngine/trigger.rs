@@ -1,47 +1,20 @@
-use std::env::remove_var;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::video::Window;
 use crate::gameLoop;
 use crate::PixelEngine::basic::{enemy, mainCharacter, meshBox};
 use crate::PixelEngine::{hitboxDetector, movementCalculator};
+use crate::PixelEngine::bosses::boss;
 
 #[derive(Clone)]
 pub struct trigger {
     triggerType: String,
-    area: FRect
+    area: FRect,
+    strings: Vec<String>
 }
 
 impl trigger {
-    pub fn new(triggerType: String, mut area: FRect) -> trigger { trigger{triggerType, area}}
-    pub fn trigger(&mut self, meshBox: &mut meshBox, mainCharacter: &mut mainCharacter, enemies: &mut Vec<enemy>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool, alive: &mut bool) {
-        let mut newArea = false;
-        let mut file = String::new();
-        let mut index = 0;
-        for letter in self.triggerType.chars() {
-            if !newArea {
-                match index {
-                    0 => if letter == 'n' { index += 1; continue },
-                    1 => if letter == 'e' { index += 1; continue },
-                    2 => if letter == 'w' { index += 1; continue },
-                    3 => if letter == 'A' { index += 1; continue },
-                    4 => if letter == 'r' { index += 1; continue },
-                    5 => if letter == 'e' { index += 1; continue },
-                    6 => if letter == 'a' {  },
-                    _ => {}
-                }
-            }
-            else {
-                file.push(letter);
-            }
-            if index == 6 {
-                newArea = true;
-            }
-            if !newArea {
-                break
-            }
-            index += 1;
-        }
-
+    pub fn new(triggerType: String, area: FRect, strings: Vec<String>) -> trigger { trigger{triggerType, area, strings}}
+    pub fn trigger(&mut self, meshBox: &mut meshBox, mainCharacter: &mut mainCharacter, enemies: &mut Vec<enemy>, bosses: &mut Vec<boss>, textureVec: &mut Vec<Texture>, renderer: &mut WindowCanvas, window: &mut Window, running: &mut bool, alive: &mut bool) {
         let hitbox = FRect::new(
             (self.area.x - meshBox.x) * 6.0,
             (self.area.y - meshBox.y) * 6.0,
@@ -49,60 +22,105 @@ impl trigger {
             self.area.h*6.0
         );
 
-        if newArea {
-            loadNewArea(file, hitbox, meshBox, renderer, window, mainCharacter, textureVec, running, alive);
-        }
-
         match self.triggerType.as_str() {
-            "impassable" => impassable(mainCharacter, hitbox, enemies, textureVec),
+            "impassable" => impassable(mainCharacter, hitbox, enemies, bosses, meshBox, &self.strings),
             "setNewRespawn" => setNewRespawn(hitbox, mainCharacter, meshBox),
+            "newArea" => loadNewArea(self.strings[0].clone(), hitbox, meshBox, renderer, window, mainCharacter, textureVec, running, alive),
             _ => {}
         }
     }
 }
 
-fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, enemies: &mut Vec<enemy>, textureVec: &Vec<Texture>) {
+fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, enemies: &mut Vec<enemy>, bosses: &mut Vec<boss>, meshBox: &meshBox, strings: &Vec<String>) {
+    if strings.contains(&"character".to_string()) {
+        if hitboxDetector(hitBox, mainCharacter.hitBox) {
+            let topMain = mainCharacter.hitBox.y;
+            let bottomMain = mainCharacter.hitBox.y + mainCharacter.hitBox.h;
+            let leftMain = mainCharacter.hitBox.x;
+            let rightMain = mainCharacter.hitBox.x + mainCharacter.hitBox.w;
 
-    if hitboxDetector(hitBox, mainCharacter.hitBox) { 
-        let topMain = mainCharacter.hitBox.y;
-        let bottomMain = mainCharacter.hitBox.y + mainCharacter.hitBox.h;
-        let leftMain = mainCharacter.hitBox.x;
-        let rightMain = mainCharacter.hitBox.x + mainCharacter.hitBox.w;
+            let top = hitBox.y;
+            let bottom = hitBox.y + hitBox.h;
+            let left = hitBox.x;
+            let right = hitBox.x + hitBox.w;
 
-        let top = hitBox.y;
-        let bottom = hitBox.y + hitBox.h;
-        let left = hitBox.x;
-        let right = hitBox.x + hitBox.w;
-
-        if leftMain > left - (mainCharacter.hitBox.w - 7.0) && rightMain < right + (mainCharacter.hitBox.w - 7.0)  {
-            if bottomMain > top && bottomMain < bottom {
-                mainCharacter.y = hitBox.y - mainCharacter.hitBox.h;
+            if leftMain > left - (mainCharacter.hitBox.w - 7.0) && rightMain < right + (mainCharacter.hitBox.w - 7.0) {
+                if bottomMain > top && bottomMain < bottom {
+                    mainCharacter.y = hitBox.y - mainCharacter.hitBox.h;
+                }
+                if topMain < bottom && topMain > top {
+                    mainCharacter.y = hitBox.y + hitBox.h;
+                }
             }
-            if topMain < bottom && topMain > top {
-                mainCharacter.y = hitBox.y + hitBox.h;
-
-            }
-        }
-        else if topMain > top - (mainCharacter.hitBox.h - 7.0) && bottomMain < bottom + (mainCharacter.hitBox.h - 7.0) {
-            if leftMain > left && leftMain < right {
-                mainCharacter.x = hitBox.x + hitBox.w;
-            }
-            if rightMain < right && rightMain > left {
-                mainCharacter.x = hitBox.x - mainCharacter.hitBox.w;
+            else if topMain > top - (mainCharacter.hitBox.h - 7.0) && bottomMain < bottom + (mainCharacter.hitBox.h - 7.0) {
+                if leftMain > left && leftMain < right {
+                    mainCharacter.x = hitBox.x + hitBox.w;
+                }
+                if rightMain < right && rightMain > left {
+                    mainCharacter.x = hitBox.x - mainCharacter.hitBox.w;
+                }
             }
         }
     }
     // add this for enemies. also knockback for when the main character gets hit
     for enemy in enemies.iter_mut() {
-        if hitboxDetector(enemy.hitBox, hitBox){
-            let speed = 1.0;
+        if hitboxDetector(hitBox, enemy.hitBox) {
+            let topMain = enemy.hitBox.y;
+            let bottomMain = enemy.hitBox.y + enemy.hitBox.h;
+            let leftMain = enemy.hitBox.x;
+            let rightMain = enemy.hitBox.x + enemy.hitBox.w;
 
-            let dx = hitBox.x - enemy.x * 6.0;
-            let dy = hitBox.y - enemy.y * 6.0;
+            let top = hitBox.y;
+            let bottom = hitBox.y + hitBox.h;
+            let left = hitBox.x;
+            let right = hitBox.x + hitBox.w;
 
-            let m = movementCalculator(dx, dy, speed);
+            if leftMain > left - (enemy.hitBox.w - 6.0) && rightMain < right + (enemy.hitBox.w - 6.0) {
+                if bottomMain > top && bottomMain < bottom {
+                    enemy.y = ((hitBox.y - enemy.hitBox.h/2.0) + meshBox.y * 6.0) / 6.0;
+                }
+                if topMain < bottom && topMain > top {
+                    enemy.y = ((hitBox.y + hitBox.h - enemy.hitBox.h/2.0) + meshBox.y * 6.0) / 6.0;
+                }
+            }
+            else if topMain > top - (enemy.hitBox.h - 6.0)  && bottomMain < bottom + (enemy.hitBox.h - 6.0) {
+                if leftMain > left && leftMain < right {
+                    enemy.x = ((hitBox.x + hitBox.w- enemy.hitBox.h/2.0) + meshBox.x * 6.0) / 6.0;
+                }
+                if rightMain < right && rightMain > left {
+                    enemy.x = ((hitBox.x - enemy.hitBox.w/2.0) + meshBox.x * 6.0) / 6.0;
+                }
+            }
+            println!("test");
+        }
+    }
+    for boss in bosses.iter_mut() {
+        if hitboxDetector(hitBox, boss.hitbox) {
+            let topMain = boss.hitbox.y;
+            let bottomMain = boss.hitbox.y + boss.hitbox.h;
+            let leftMain = boss.hitbox.x;
+            let rightMain = boss.hitbox.x + boss.hitbox.w;
 
-            enemy.updatePosition(-m.0, -m.1, &textureVec[3]);
+            let top = hitBox.y;
+            let bottom = hitBox.y + hitBox.h;
+            let left = hitBox.x;
+            let right = hitBox.x + hitBox.w;
+
+            if leftMain > left - (boss.hitbox.w - 6.0) && rightMain < right + (boss.hitbox.w - 6.0) {
+                if bottomMain > top && bottomMain < bottom {
+                    boss.y = ((hitBox.y - boss.hitbox.h) + meshBox.y * 6.0) / 6.0;
+                }
+                if topMain < bottom && topMain > top {
+                    boss.y = ((hitBox.y + boss.hitbox.h) + meshBox.y * 6.0) / 6.0;
+                }
+            } else if topMain > top - (boss.hitbox.h - 6.0) && bottomMain < bottom + (boss.hitbox.h - 6.0) {
+                if leftMain > left && leftMain < right {
+                    boss.x = ((hitBox.x + boss.hitbox.w) + meshBox.x * 6.0) / 6.0;
+                }
+                if rightMain < right && rightMain > left {
+                    boss.x = ((hitBox.x - boss.hitbox.w) + meshBox.x * 6.0) / 6.0;
+                }
+            }
         }
     }
 }

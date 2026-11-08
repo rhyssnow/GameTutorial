@@ -4,38 +4,376 @@
       "background": "src/Assets/tutorialThree.png",
       "foreground": "src/Assets/tutorialThreeForeground.png",
       "triggers": [
-        {"triggerType":  "newAreatutorialTwo", "x": -3, "y": 747, "w": 0, "h": 170},
-        {"triggerType":  "impassable", "x": 350, "y": 680, "w": 263, "h": 9},
-        {"triggerType":  "impassable", "x": 267, "y": 734, "w": 85, "h": 19},
-        {"triggerType":  "impassable", "x": 294, "y": 746, "w": 32, "h": 28},
-        {"triggerType":  "impassable", "x": 229, "y": 734, "w": 44, "h": 27},
-        {"triggerType":  "impassable", "x": 193, "y": 733, "w": 36, "h": 16},
-        {"triggerType":  "impassable", "x": 175, "y": 733, "w": 18, "h": 9},
-        {"triggerType":  "impassable", "x": 142, "y": 734, "w": 33, "h": 24},
-        {"triggerType":  "impassable", "x": 116, "y": 756, "w": 33, "h": 15},
-        {"triggerType":  "impassable", "x": 84, "y": 749, "w": 33, "h": 11},
-        {"triggerType":  "impassable", "x": 34, "y": 746, "w": 47, "h": 20},
-        {"triggerType":  "impassable", "x": 0, "y": 747, "w": 33, "h": 10},
-        {"triggerType":  "impassable", "x": 0, "y": 887, "w": 372, "h": 69},
-        {"triggerType":  "impassable", "x": 381, "y": 918, "w": 253, "h": 30},
-        {"triggerType":  "impassable", "x": 372, "y": 871, "w": 9, "h": 46},
-        {"triggerType":  "impassable", "x": 371, "y": 858, "w": 8, "h": 13},
-        {"triggerType":  "impassable", "x": 369, "y": 843, "w": 8, "h": 15},
-        {"triggerType":  "impassable", "x": 367, "y": 832, "w": 7, "h": 11},
-        {"triggerType":  "impassable", "x": 365, "y": 751, "w": 9, "h": 24},
-        {"triggerType":  "impassable", "x": 352, "y": 729, "w": 10, "h": 22},
-        {"triggerType":  "impassable", "x": 349, "y": 707, "w": 10, "h": 22},
-        {"triggerType":  "impassable", "x": 343, "y": 688, "w": 12, "h": 20},
-        {"triggerType":  "impassable", "x": 630, "y": 894, "w": 27, "h": 25},
-        {"triggerType":  "impassable", "x": 627, "y": 868, "w": 27, "h": 26},
-        {"triggerType":  "impassable", "x": 624, "y": 843, "w": 27, "h": 25},
-        {"triggerType":  "impassable", "x": 621, "y": 819, "w": 27, "h": 24},
-        {"triggerType":  "impassable", "x": 618, "y": 795, "w": 27, "h": 24},
-        {"triggerType":  "impassable", "x": 615, "y": 771, "w": 27, "h": 24},
-        {"triggerType":  "impassable", "x": 612, "y": 747, "w": 27, "h": 24},
-        {"triggerType":  "impassable", "x": 609, "y": 725, "w": 27, "h": 22},
-        {"triggerType":  "impassable", "x": 605, "y": 679, "w": 29, "h": 46}
-
+        {
+          "triggerType": "newArea",
+          "x": -3,
+          "y": 747,
+          "w": 0,
+          "h": 170,
+          "strings": [
+            "tutorialTwo"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 350,
+          "y": 680,
+          "w": 263,
+          "h": 9,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 267,
+          "y": 734,
+          "w": 85,
+          "h": 19,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 294,
+          "y": 746,
+          "w": 32,
+          "h": 28,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 229,
+          "y": 734,
+          "w": 44,
+          "h": 27,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 193,
+          "y": 733,
+          "w": 36,
+          "h": 16,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 175,
+          "y": 733,
+          "w": 18,
+          "h": 9,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 142,
+          "y": 734,
+          "w": 33,
+          "h": 24,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 116,
+          "y": 756,
+          "w": 33,
+          "h": 15,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 84,
+          "y": 749,
+          "w": 33,
+          "h": 11,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 34,
+          "y": 746,
+          "w": 47,
+          "h": 20,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 0,
+          "y": 747,
+          "w": 33,
+          "h": 10,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 0,
+          "y": 887,
+          "w": 372,
+          "h": 69,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 381,
+          "y": 918,
+          "w": 253,
+          "h": 30,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 372,
+          "y": 871,
+          "w": 9,
+          "h": 46,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 371,
+          "y": 858,
+          "w": 8,
+          "h": 13,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 369,
+          "y": 843,
+          "w": 8,
+          "h": 15,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 367,
+          "y": 832,
+          "w": 7,
+          "h": 11,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 365,
+          "y": 751,
+          "w": 9,
+          "h": 24,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 352,
+          "y": 729,
+          "w": 10,
+          "h": 22,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 349,
+          "y": 707,
+          "w": 10,
+          "h": 22,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 343,
+          "y": 688,
+          "w": 12,
+          "h": 20,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 630,
+          "y": 894,
+          "w": 27,
+          "h": 25,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 627,
+          "y": 868,
+          "w": 27,
+          "h": 26,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 624,
+          "y": 843,
+          "w": 27,
+          "h": 25,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 621,
+          "y": 819,
+          "w": 27,
+          "h": 24,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 618,
+          "y": 795,
+          "w": 27,
+          "h": 24,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 615,
+          "y": 771,
+          "w": 27,
+          "h": 24,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 612,
+          "y": 747,
+          "w": 27,
+          "h": 24,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 609,
+          "y": 725,
+          "w": 27,
+          "h": 22,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        },
+        {
+          "triggerType": "impassable",
+          "x": 605,
+          "y": 679,
+          "w": 29,
+          "h": 46,
+          "strings": [
+            "enemies",
+            "character",
+            "bosses"
+          ]
+        }
       ],
       "hazards": [
       ]

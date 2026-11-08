@@ -41,7 +41,11 @@ pub fn createEnvironmentFromJson (file: PathBuf) -> (Vec<String>, meshBox, Vec<e
                 trigger["w"].as_f64().unwrap() as f32,
                 trigger["h"].as_f64().unwrap() as f32,
             );
-            triggerVec.push(trigger::new(trigger["triggerType"].as_str().unwrap().to_string(), triggerArea));
+            let mut strings = Vec::new();
+            for string in trigger["strings"].as_array().unwrap() {
+                strings.push(string.as_str().unwrap().to_string());
+            }
+            triggerVec.push(trigger::new(trigger["triggerType"].as_str().unwrap().to_string(), triggerArea, strings));
         }
         for hazard in meshBox["hazards"].as_array().unwrap() {
             let hazardArea = FRect::new(

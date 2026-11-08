@@ -1,1 +1,9 @@
-{"currentArea":"tutorialTwo","damage":0.10000000149011612,"mainX":929.3064575195312,"mainY":536.7131958007812,"maxHealth":20.0,"x":639.7814331054688,"y":715.32861328125}
+{
+  "maxHealth" : 20.0,
+  "damage": 0.1,
+  "currentArea" : "tutorialOne",
+  "x" : 105.0,
+  "y" : 75.0,
+  "mainY": 540.0,
+  "mainX": 960.0
+}

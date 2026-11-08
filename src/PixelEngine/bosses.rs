@@ -6,7 +6,7 @@ use crate::PixelEngine::basic::{mainCharacter, meshBox, swordAttack};
 use crate::PixelEngine::{asPositive, damageMaincharacter, hitboxDetector, movementCalculator};
 
 pub struct boss {
-    x: f32,
+    pub(crate) x: f32,
     pub(crate) y: f32,
     pub(crate) hitbox: FRect,
     triggerArea: FRect,
