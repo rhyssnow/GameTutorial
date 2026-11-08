@@ -75,23 +75,22 @@ fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, enemies: &mut V
             let left = hitBox.x;
             let right = hitBox.x + hitBox.w;
 
-            if leftMain > left - (enemy.hitBox.w - 6.0) && rightMain < right + (enemy.hitBox.w - 6.0) {
+            if leftMain > left - (enemy.hitBox.w - 18.0) && rightMain < right + (enemy.hitBox.w - 18.0) {
                 if bottomMain > top && bottomMain < bottom {
                     enemy.y = ((hitBox.y - enemy.hitBox.h/2.0) + meshBox.y * 6.0) / 6.0;
                 }
                 if topMain < bottom && topMain > top {
-                    enemy.y = ((hitBox.y + hitBox.h - enemy.hitBox.h/2.0) + meshBox.y * 6.0) / 6.0;
+                    enemy.y = ((hitBox.y + hitBox.h + enemy.hitBox.h/2.0) + meshBox.y * 6.0) / 6.0;
                 }
             }
             else if topMain > top - (enemy.hitBox.h - 6.0)  && bottomMain < bottom + (enemy.hitBox.h - 6.0) {
                 if leftMain > left && leftMain < right {
-                    enemy.x = ((hitBox.x + hitBox.w- enemy.hitBox.h/2.0) + meshBox.x * 6.0) / 6.0;
+                    enemy.x = ((hitBox.x + hitBox.w + enemy.hitBox.h/2.0) + meshBox.x * 6.0) / 6.0;
                 }
                 if rightMain < right && rightMain > left {
                     enemy.x = ((hitBox.x - enemy.hitBox.w/2.0) + meshBox.x * 6.0) / 6.0;
                 }
             }
-            println!("test");
         }
     }
     for boss in bosses.iter_mut() {
@@ -106,19 +105,20 @@ fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, enemies: &mut V
             let left = hitBox.x;
             let right = hitBox.x + hitBox.w;
 
-            if leftMain > left - (boss.hitbox.w - 6.0) && rightMain < right + (boss.hitbox.w - 6.0) {
+            if leftMain > left - (boss.hitbox.w - 18.0) && rightMain < right + (boss.hitbox.w - 18.0) {
                 if bottomMain > top && bottomMain < bottom {
-                    boss.y = ((hitBox.y - boss.hitbox.h) + meshBox.y * 6.0) / 6.0;
+                    boss.y = ((hitBox.y - boss.hitbox.h/2.0) + meshBox.y * 6.0) / 6.0;
                 }
                 if topMain < bottom && topMain > top {
-                    boss.y = ((hitBox.y + boss.hitbox.h) + meshBox.y * 6.0) / 6.0;
+                    boss.y = ((hitBox.y + hitBox.h + boss.hitbox.h/2.0) + meshBox.y * 6.0) / 6.0;
                 }
-            } else if topMain > top - (boss.hitbox.h - 6.0) && bottomMain < bottom + (boss.hitbox.h - 6.0) {
+            }
+            else if topMain > top - (boss.hitbox.h - 6.0)  && bottomMain < bottom + (boss.hitbox.h - 6.0) {
                 if leftMain > left && leftMain < right {
-                    boss.x = ((hitBox.x + boss.hitbox.w) + meshBox.x * 6.0) / 6.0;
+                    boss.x = ((hitBox.x + hitBox.w + boss.hitbox.h/2.0) + meshBox.x * 6.0) / 6.0;
                 }
                 if rightMain < right && rightMain > left {
-                    boss.x = ((hitBox.x - boss.hitbox.w) + meshBox.x * 6.0) / 6.0;
+                    boss.x = ((hitBox.x - boss.hitbox.w/2.0) + meshBox.x * 6.0) / 6.0;
                 }
             }
         }
