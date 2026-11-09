@@ -478,7 +478,8 @@ pub struct enemy {
     pub(crate) roam: bool,
     pub(crate) attacks: attacks,
     pub roamPattern: roamPattern,
-    texturePos: usize
+    texturePos: usize,
+    pub speed: f32,
 }
 impl enemy {
     pub fn new(x: f32, y: f32, enemyUp: Vec<FRect>, enemyDown: Vec<FRect>, enemyLeft: Vec<FRect>, enemyRight: Vec<FRect>, health: f32, damage: f32, attacks: attacks, roamPattern: roamPattern, texturePos: usize) -> enemy {enemy{
@@ -499,7 +500,8 @@ impl enemy {
         roam: true,
         attacks,
         roamPattern,
-        texturePos
+        texturePos,
+        speed: 0.0
     }}
     pub fn render(&mut self, textureVec: &Vec<Texture>, renderer: &mut WindowCanvas, meshBox: &mut meshBox) {
         if !self.render{

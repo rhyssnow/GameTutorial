@@ -26,6 +26,7 @@ fn missileAttack (mainCharacter: &mainCharacter, backgroundTexture: &Texture, me
     }
 
     let speed = 0.7;
+    enemy.speed = speed;
     let mainPosX = mainCharacter.x + meshBox.x * 6.0;
     let mainPosY = mainCharacter.y + meshBox.y * 6.0;
 

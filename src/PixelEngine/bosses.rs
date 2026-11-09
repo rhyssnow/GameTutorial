@@ -27,10 +27,11 @@ pub struct boss {
     texturePos: usize,
     damage: f32,
     sword: swordAttack,
-    mode: i32,
-    time: Instant,
-    bool: bool,
-    bool2: bool,
+    pub(crate) speed: f32,
+    pub(crate) mode: i32,
+    pub(crate) time: Instant,
+    pub(crate) bool: bool,
+    pub(crate) bool2: bool,
     float: f32,
     float2: f32
 }
@@ -58,6 +59,7 @@ impl boss {
         dead: false,
         texturePos,
         sword: swordAttack::new("up".to_string(), texturePos+1),
+        speed: 0.0,
         mode: 0,
         time: Instant::now(),
         bool: false,
@@ -180,6 +182,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
     boss.mode = match boss.mode {
         0 => {
             let speed = 0.5;
+            boss.speed = speed;
 
             let m = movementCalculator(dx, dy, speed);
             let mut vertical = true;
@@ -250,7 +253,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
             let mut number = 2;
 
             if boss.bool {
-                if boss.sword.swingCooldown.elapsed().as_millis() < 700 && boss.bool2 {
+                if boss.sword.swingCooldown.elapsed().as_millis() < 900 && boss.bool2 {
                     boss.sword.swingPhase = 0;
                     boss.sword.swingPhaseFloat = 0.0;
                     boss.sword.direction = boss.direction.clone();
@@ -258,6 +261,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                     boss.float2 = dy;
                 } else if boss.bool2{
                     let speed = 10.0;
+                    boss.speed = speed;
 
                     let m = movementCalculator(boss.float, boss.float2, speed);
                     let mut vertical = true;
@@ -286,7 +290,8 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                     damageMaincharacter(mainCharacter, window, boss.hitbox, boss.damage * 2.0, alive);
                 }
                 else {
-                    let speed = 25.0;
+                    let speed = 15.0;
+                    boss.speed = speed;
 
                     let m = movementCalculator(dx, dy, speed);
                     let mut vertical = true;
@@ -311,7 +316,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                     }
 
                     boss.updatePosition(-m.0, -m.1, backgroundTexture);
-                    if (dx*dx + dy*dy).sqrt() >= 350.0 {
+                    if (dx*dx + dy*dy).sqrt() >= 450.0 {
                         boss.bool2 = true;
                     }
                 }
@@ -325,7 +330,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                     number = 0;
                 }
             }
-            if boss.sword.swingCooldown.elapsed().as_millis() > 1100 && boss.bool {
+            if boss.sword.swingCooldown.elapsed().as_millis() > 1300 && boss.bool {
                 boss.bool2 = false;
                 boss.bool = false;
                 number = 0;
@@ -356,6 +361,7 @@ fn protectorKnightActivated (boss: &mut boss, mainCharacter: &mut mainCharacter,
                 }
                 else {
                     let speed = 2.5;
+                    boss.speed = speed;
 
                     let m = movementCalculator(dx, dy, speed);
                     let mut vertical = true;

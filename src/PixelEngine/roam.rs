@@ -38,6 +38,7 @@ fn squareRoam (enemy: &mut enemy, roamArea: &FRect, mut movePoint: &mut i32, bac
     }
 
     let speed = 0.5;
+    enemy.speed = speed;
     let mainPosX = coordinates.0;
     let mainPosY = coordinates.1;
 

@@ -1,3 +1,4 @@
+use std::time::Instant;
 use sdl3::render::{FRect, Texture, WindowCanvas};
 use sdl3::video::Window;
 use crate::gameLoop;
@@ -24,6 +25,7 @@ impl trigger {
 
         match self.triggerType.as_str() {
             "impassable" => impassable(mainCharacter, hitbox, enemies, bosses, meshBox, &self.strings),
+            "impassableOneWay" => impassableOneWay(mainCharacter, hitbox, enemies, bosses, meshBox, &self.strings),
             "setNewRespawn" => setNewRespawn(hitbox, mainCharacter, meshBox),
             "newArea" => loadNewArea(self.strings[0].clone(), hitbox, meshBox, renderer, window, mainCharacter, textureVec, running, alive),
             _ => {}
@@ -31,6 +33,49 @@ impl trigger {
     }
 }
 
+fn impassableOneWay (mainCharacter: &mut mainCharacter, hitBox: FRect, enemies: &mut Vec<enemy>, bosses: &mut Vec<boss>, meshBox: &meshBox, strings: &Vec<String>) {
+    let direction = strings[0].clone();
+    if strings.contains(&"character".to_string()) {
+        if hitboxDetector(hitBox, mainCharacter.hitBox) {
+            match direction.as_str() {
+                "up" => mainCharacter.y = hitBox.y + hitBox.h,
+                "down" => mainCharacter.y = hitBox.y,
+                "left" => mainCharacter.x = hitBox.x + hitBox.w,
+                "right" => mainCharacter.x = hitBox.x,
+                _ => {}
+            };
+        }
+    }
+
+    if strings.contains(&"enemies".to_string()) {
+        for enemy in enemies.iter_mut() {
+            if hitboxDetector(hitBox, enemy.hitBox) {
+                match direction.as_str() {
+                    "up" => enemy.y = ((hitBox.y + hitBox.h + enemy.hitBox.h / 2.0) + meshBox.y * 6.0) / 6.0,
+                    "down" => enemy.y = ((hitBox.y - enemy.hitBox.h / 2.0) + meshBox.y * 6.0) / 6.0,
+                    "left" => enemy.x = ((hitBox.x + hitBox.w + enemy.hitBox.h / 2.0) + meshBox.x * 6.0) / 6.0,
+                    "right" => enemy.x = ((hitBox.x - enemy.hitBox.w/2.0) + meshBox.x * 6.0) / 6.0,
+                    _ => {}
+                };
+            }
+        }
+    }
+    if strings.contains(&"bosses".to_string()) {
+        for boss in bosses.iter_mut() {
+            if hitboxDetector(hitBox, boss.hitbox) {
+                match direction.as_str() {
+                    "up" => boss.y = ((hitBox.y + hitBox.h + boss.hitbox.h / 2.0) + meshBox.y * 6.0) / 6.0,
+                    "down" => boss.y = ((hitBox.y - boss.hitbox.h / 2.0) + meshBox.y * 6.0) / 6.0,
+                    "left" => boss.x = ((hitBox.x + hitBox.w + boss.hitbox.h / 2.0) + meshBox.x * 6.0) / 6.0,
+                    "right" => boss.x = ((hitBox.x - boss.hitbox.w/2.0) + meshBox.x * 6.0) / 6.0,
+                    _ => {}
+                };
+            }
+        }
+    }
+
+    if strings.contains(&"bosses".to_string()) {}
+}
 fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, enemies: &mut Vec<enemy>, bosses: &mut Vec<boss>, meshBox: &meshBox, strings: &Vec<String>) {
     if strings.contains(&"character".to_string()) {
         if hitboxDetector(hitBox, mainCharacter.hitBox) {
@@ -63,62 +108,64 @@ fn impassable (mainCharacter: &mut mainCharacter, hitBox: FRect, enemies: &mut V
         }
     }
     // add this for enemies. also knockback for when the main character gets hit
-    for enemy in enemies.iter_mut() {
-        if hitboxDetector(hitBox, enemy.hitBox) {
-            let topMain = enemy.hitBox.y;
-            let bottomMain = enemy.hitBox.y + enemy.hitBox.h;
-            let leftMain = enemy.hitBox.x;
-            let rightMain = enemy.hitBox.x + enemy.hitBox.w;
+    if strings.contains(&"enemies".to_string()) {
+        for enemy in enemies.iter_mut() {
+            if hitboxDetector(hitBox, enemy.hitBox) {
+                let topMain = enemy.hitBox.y;
+                let bottomMain = enemy.hitBox.y + enemy.hitBox.h;
+                let leftMain = enemy.hitBox.x;
+                let rightMain = enemy.hitBox.x + enemy.hitBox.w;
 
-            let top = hitBox.y;
-            let bottom = hitBox.y + hitBox.h;
-            let left = hitBox.x;
-            let right = hitBox.x + hitBox.w;
+                let top = hitBox.y;
+                let bottom = hitBox.y + hitBox.h;
+                let left = hitBox.x;
+                let right = hitBox.x + hitBox.w;
 
-            if leftMain > left - (enemy.hitBox.w - 18.0) && rightMain < right + (enemy.hitBox.w - 18.0) {
-                if bottomMain > top && bottomMain < bottom {
-                    enemy.y = ((hitBox.y - enemy.hitBox.h/2.0) + meshBox.y * 6.0) / 6.0;
-                }
-                if topMain < bottom && topMain > top {
-                    enemy.y = ((hitBox.y + hitBox.h + enemy.hitBox.h/2.0) + meshBox.y * 6.0) / 6.0;
-                }
-            }
-            else if topMain > top - (enemy.hitBox.h - 6.0)  && bottomMain < bottom + (enemy.hitBox.h - 6.0) {
-                if leftMain > left && leftMain < right {
-                    enemy.x = ((hitBox.x + hitBox.w + enemy.hitBox.h/2.0) + meshBox.x * 6.0) / 6.0;
-                }
-                if rightMain < right && rightMain > left {
-                    enemy.x = ((hitBox.x - enemy.hitBox.w/2.0) + meshBox.x * 6.0) / 6.0;
+                if leftMain > left - (enemy.hitBox.w - enemy.speed * 12.0 + 1.0) && rightMain < right + (enemy.hitBox.w - enemy.speed * 12.0 + 1.0) {
+                    if bottomMain > top && bottomMain < bottom {
+                        enemy.y = ((hitBox.y - enemy.hitBox.h / 2.0) + meshBox.y * 6.0) / 6.0;
+                    }
+                    if topMain < bottom && topMain > top {
+                        enemy.y = ((hitBox.y + hitBox.h + enemy.hitBox.h / 2.0) + meshBox.y * 6.0) / 6.0;
+                    }
+                } else if topMain > top - (enemy.hitBox.h - enemy.speed * 12.0 + 1.0) && bottomMain < bottom + (enemy.hitBox.h - enemy.speed * 12.0 + 1.0) {
+                    if leftMain > left && leftMain < right {
+                        enemy.x = ((hitBox.x + hitBox.w + enemy.hitBox.h / 2.0) + meshBox.x * 6.0) / 6.0;
+                    }
+                    if rightMain < right && rightMain > left {
+                        enemy.x = ((hitBox.x - enemy.hitBox.w/2.0) + meshBox.x * 6.0) / 6.0;
+                    }
                 }
             }
         }
     }
-    for boss in bosses.iter_mut() {
-        if hitboxDetector(hitBox, boss.hitbox) {
-            let topMain = boss.hitbox.y;
-            let bottomMain = boss.hitbox.y + boss.hitbox.h;
-            let leftMain = boss.hitbox.x;
-            let rightMain = boss.hitbox.x + boss.hitbox.w;
+    if strings.contains(&"bosses".to_string()) {
+        for boss in bosses.iter_mut() {
+            if hitboxDetector(hitBox, boss.hitbox) {
+                let topMain = boss.hitbox.y;
+                let bottomMain = boss.hitbox.y + boss.hitbox.h;
+                let leftMain = boss.hitbox.x;
+                let rightMain = boss.hitbox.x + boss.hitbox.w;
 
-            let top = hitBox.y;
-            let bottom = hitBox.y + hitBox.h;
-            let left = hitBox.x;
-            let right = hitBox.x + hitBox.w;
+                let top = hitBox.y;
+                let bottom = hitBox.y + hitBox.h;
+                let left = hitBox.x;
+                let right = hitBox.x + hitBox.w;
 
-            if leftMain > left - (boss.hitbox.w - 18.0) && rightMain < right + (boss.hitbox.w - 18.0) {
-                if bottomMain > top && bottomMain < bottom {
-                    boss.y = ((hitBox.y - boss.hitbox.h/2.0) + meshBox.y * 6.0) / 6.0;
-                }
-                if topMain < bottom && topMain > top {
-                    boss.y = ((hitBox.y + hitBox.h + boss.hitbox.h/2.0) + meshBox.y * 6.0) / 6.0;
-                }
-            }
-            else if topMain > top - (boss.hitbox.h - 6.0)  && bottomMain < bottom + (boss.hitbox.h - 6.0) {
-                if leftMain > left && leftMain < right {
-                    boss.x = ((hitBox.x + hitBox.w + boss.hitbox.h/2.0) + meshBox.x * 6.0) / 6.0;
-                }
-                if rightMain < right && rightMain > left {
-                    boss.x = ((hitBox.x - boss.hitbox.w/2.0) + meshBox.x * 6.0) / 6.0;
+                if leftMain > left - (boss.hitbox.w - boss.speed * 18.0 + 1.0) && rightMain < right + (boss.hitbox.w - boss.speed * 18.0 + 1.0) {
+                    if bottomMain > top && bottomMain < bottom {
+                        boss.y = ((hitBox.y - boss.hitbox.h / 2.0) + meshBox.y * 6.0) / 6.0;
+                    }
+                    if topMain < bottom && topMain > top {
+                        boss.y = ((hitBox.y + hitBox.h + boss.hitbox.h / 2.0) + meshBox.y * 6.0) / 6.0;
+                    }
+                } else if topMain > top - (boss.hitbox.h - boss.speed * 12.0 + 1.0) && bottomMain < bottom + (boss.hitbox.h - boss.speed * 12.0 + 1.0) {
+                    if leftMain > left && leftMain < right {
+                        boss.x = ((hitBox.x + hitBox.w + boss.hitbox.h / 2.0) + meshBox.x * 6.0) / 6.0;
+                    }
+                    if rightMain < right && rightMain > left {
+                        boss.x = ((hitBox.x - boss.hitbox.w/2.0) + meshBox.x * 6.0) / 6.0;
+                    }
                 }
             }
         }
