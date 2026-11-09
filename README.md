@@ -1,10 +1,10 @@
-A continuation of what I have been doing these past two weeks. The tutorial level (unclear if it will be fully polished and finished) for a 2d top down open world game I am making. Uses the pixel engine backend I have been working on the last two weeks. So far it is only half done; there is another background section that I will work on next week, and a mini-boss at the end as a skill-check, I might still need to do some polishing in week 3, with both the code and the assets, because as you can tell, the background is not done for this level, and one of the jumps needs some balancing.
-
+A continuation of what I have been doing these past two weeks. The tutorial level (unclear if it will be fully polished and finished) for a 2d top down open world game I am making. Uses the pixel engine backend I have been working on the first two weeks. Almost done, just needs a bug fix or two, tutorial messages, some animations, and a main menu. hopefully will be done next week, but maybe two more.
 
 CONTROLS:
 WASD for movement
 X for attack
 Shift for sprint
+Space to jump
 Arrow keys to look in a direction
 You can look in a direction other than the one you are moving in, but your speed will be reduced.
 
